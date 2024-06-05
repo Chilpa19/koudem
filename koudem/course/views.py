@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from .form import *
+from django.contrib.auth.decorators import login_required
+
 
 def create(request):
     
@@ -15,7 +17,9 @@ def create(request):
             form.save()
             return render(request,"./course/displayCourse.html")
         return HttpResponse("Curso NO Saved :c")
-    
+
+
+@login_required    
 def courses_list(request):
     courses = Course.objects.all()
     print(courses)

@@ -53,7 +53,8 @@ INSTALLED_APPS = [
     'user',
     'index',
     'course',
-    'menu'
+    'menu',
+    'core'
 ]
 
 MIDDLEWARE = [

@@ -1,5 +1,12 @@
-Portal works! {{ username }}
+{% extends 'menu/base.html' %}
 
-<a href="{% url "create" %}">Crear curso</a>
+{% block content %}
 
-<a href="{% url "courses_list" %}">Ver cursos</a>
+    <div>
+        Portal works! {{ username }}
+    </div>
+
+
+{% endblock %}
+
+
