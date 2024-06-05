@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Contacto</title>
+</head>
+<body>
+    <h1>Create Course</h1>
+    {% load static %}
+    <img src="{% static 'media/images/descarga.png' %}" alt="Example Image">
+    <form enctype="multipart/form-data" action="{% url 'courses_list' %}" method="post">
+        {% csrf_token %}
+
+        {{ form }}
+
+        <input type="submit" value="Enviar">
+    </form>
+</body>
+</html>

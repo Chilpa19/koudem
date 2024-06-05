@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Course List</title>
+</head>
+<body>
+    <h1>Course List</h1>
+    <ul>
+        {% for course in courses %}
+            <li>
+                <h2>{{ course.name }}</h2>
+                <img src="{{ course.image.url }}" alt="{{ course.name }}">
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
