@@ -6,8 +6,10 @@ from django.contrib.auth.decorators import login_required
 
 
 def portal(request):
-    username=request.POST['username']
-    context={"username":username}
+    if request.method=='POST':
+        username=request.POST['username']
+
+    context={"username":" "}
     return render(request,'menu/portal.html',context)
 
 @login_required
