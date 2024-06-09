@@ -1,4 +1,4 @@
-from django.shortcuts import render
+
 from django.http import HttpResponse
 from django.shortcuts import render
 # from .form import UserForm
@@ -12,7 +12,14 @@ def portal(request):
     context={"username":" "}
     return render(request,'menu/portal.html',context)
 
-@login_required
-def mision(required):
+
+def mision(request):
     return HttpResponse("Soy Msiions")
+
+def vision(request):
+    return HttpResponse("Soy vision")
+
+def dashboard(request):
+    return render(request,"menu/dashboard.html",{})
+
 

@@ -143,4 +143,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #Varaibles of redirection
 
 LOGIN_REDIRECT_URL = 'portal'
-LOGOUT_REDIRECT_URL = 'portal'
+LOGOUT_REDIRECT_URL = 'dashboard'
