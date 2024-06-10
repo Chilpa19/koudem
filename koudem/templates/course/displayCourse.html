@@ -1,5 +1,8 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html>
+    <link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
 <head>
     <title>Course List</title>
 </head>
@@ -13,5 +16,32 @@
             </li>
         {% endfor %}
     </ul>
+
+    
+
+
+
+    <div class="course-container">
+        <div class="course-card">
+            <img src="course-image.jpg" alt="Curso 1" class="course-image">
+            <div class="course-content">
+                <h3 class="course-title">Curso 1</h3>
+                <p class="course-description">Descripción breve del curso 1.</p>
+                <a href="#" class="course-button">Más información</a>
+            </div>
+        </div>
+        <div class="course-card">
+            <img src="course-image.jpg" alt="Curso 2" class="course-image">
+            <div class="course-content">
+                <h3 class="course-title">Curso 2</h3>
+                <p class="course-description">Descripción breve del curso 2.</p>
+                <a href="#" class="course-button">Más información</a>
+            </div>
+        </div>
+     
+    </div>
+
+</html>
+
 </body>
 </html>

@@ -1,12 +1,12 @@
-{% extends 'menu/base.html' %}
+{% extends "menu/base_dashboard.html" %}
 
 {% block content %}
 
     <div>
-        Portal works! {{ username }}
+       <h1>Portal</h1>
     </div>
+    <a href="{% url "courses_list" %}">Ver cursos</a>
 
 
 {% endblock %}
-
 

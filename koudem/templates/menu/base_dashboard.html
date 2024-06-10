@@ -1,24 +1,37 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'styles/bases/style.css' %}">
     <title>Formulario de Contacto</title>
 </head>
 <body>
-    <h1>Dashboard de Koudem</h1>
 
-    <a href="{% url "vision" %}">Vision</a>
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                <a href="/">MiLogo</a>
+            </div>
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="{% url "vision" %}">Vision</a></li>
+                    <li><a href="{% url "mision" %}">Mision</a></li>
+                    <li><a href="/services">Servicios</a></li>
+                    <li><a href="/contact">Contacto</a></li>
+                    {% if request.user.is_authenticated %}
 
-    <a href="{% url "mision" %}">Mision</a>
-
-    {% if request.user.is_authenticated %}
-
-        <a href="{% url "exit" %}">Salir</a>
-    {% else %}
-
-        <a href="{% url "login" %}">Login</a>
-    {% endif %}
+                        <li><a href="{% url "exit" %}">Salir</a></li>
+                    {% else %}
+            
+                        <li><a href="{% url "login" %}">Login</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
 
 
     {% block content %}{% endblock %}
