@@ -31,5 +31,17 @@ def courses_list(request):
 
 
 
+@login_required    
+def courses_view(request, course_id):
+    # courses = Course.objects.all()
+    # print(courses)
+    # for i in courses:
+    #     print(i.image)
+    context={"id":course_id}
+   
+    return render(request, "./course/viewCourse.html",context)
+
+
+
 
 
