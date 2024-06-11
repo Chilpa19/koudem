@@ -1,6 +1,10 @@
+{% extends "menu/base_dashboard.html" %}
 {% load static %}
 
-<!DOCTYPE html>
+
+
+{% block content %}
+
 <html>
     <link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
 <head>
@@ -23,8 +27,8 @@
                 </div>
             {% endfor %} {% endcomment %}
         </div>
+    </body>
 
-</html>
 
-</body>
-</html>
+
+{% endblock %}
