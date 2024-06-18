@@ -30,20 +30,29 @@ class UserRegistrationForm(UserCreationForm):
         return user    
     
 
-class EmailAuthenticationForm(AuthenticationForm):
-    username = forms.EmailField(label='Email', max_length=255)
+class EmailAuthenticationForm(forms.Form):
+    email = forms.EmailField(label='Email', max_length=255)
     password = forms.CharField(label= 'Password',widget=PasswordInput)
 
+    def __init__(self, *args,**kwards):
+        self.user_cache = None
+        super().__init__(*args,**kwards)
+
     def clean(self):
-        email = self.cleaned_data.get('username')
-        password = self.cleaned_data.get('password')
+        print("cleaaaaan")
+        cleaned_data = super().clean()
+        email = cleaned_data.get('email')
+        password = cleaned_data.get('password')
+
+        print("email",email)
+        print("pass",password)
 
         if email and password:
-            self.user_cache = authenticate(self.request, username=email,password=password)
+            self.user_cache = authenticate( username=email,password=password)
             if self.user_cache is None:
                 raise forms.ValidationError("Credenciales invalidas")
             
-        return self.changed_data
+        return self.cleaned_data
     
     def get_user(self):
         return self.user_cache
