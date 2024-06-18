@@ -4,10 +4,11 @@ from django.shortcuts import render
 #Mensajes
 from django.contrib import messages
 
-from .form import UserForm, UserRegistrationForm
+from .form import UserForm, UserRegistrationForm, EmailAuthenticationForm
 from django.contrib.auth import logout
 
 def login(request):
+    print("Loginnnnn")
     if request.method=='GET':
         form=UserForm()
         context={"form":form}
@@ -42,6 +43,18 @@ def register(request):
     return render(request=request, template_name="./registration/registration.html",context={"form":form})
 
     
+def custom_login(request):
+    print("Custom, works")
+    if request.method == 'POST':
+        form = EmailAuthenticationForm(request.POST)
 
+        if form.is_valid():
+            user = form.get_user()
+            if user is not None:
+                login(request,user)
+                return redirect('portal')
+            
+    else:
+        form = EmailAuthenticationForm()
 
-
+    return render(request,"users/login.html",{"form":form})

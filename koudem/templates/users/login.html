@@ -6,13 +6,13 @@
     <title>Formulario de Contacto</title>
 </head>
 <body>
-    <h1>Login</h1>
+    <h1>Login Custom</h1>
     <form action="{% url 'portal' %}" method="post">
         {% csrf_token %}
 
-        {{ form }}
+        {{ form.as_p }}
 
-        <input type="submit" value="Enviar">
+        <input type="submit" value="Login">
     </form>
 </body>
 </html>
