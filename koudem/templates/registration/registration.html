@@ -23,23 +23,8 @@
             <button type="submit">Sign up</button>
         </div>
 
-        Already have an account? <li><a href="{% url "login" %}">Login</a></li>
-        {% comment %} <label for="username">username:</label><br>
-        <input type="text" id="username" name="username" required><br><br>
+        Already have an account? <li><a href="{% url "custom_login" %}">Login</a></li>
 
-        <label for="name">name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
-
-        <label for="last_ape">last_ape:</label><br>
-        <input type="text" id="last_ape" name="last_ape" required><br><br>
-
-        <label for="last_mat">last_mat:</label><br>
-        <input type="text" id="last_mat" name="last_mat" required><br><br>
-
-        <label for="email">Correo Electrónico:</label><br>
-        <input type="email" id="email" name="email" required><br><br>
-
-        <input type="submit" value="Enviar"> {% endcomment %}
     </form>
 </body>
 </html>

@@ -4,6 +4,9 @@ from django.forms import ModelForm, PasswordInput
 from django.contrib.auth import get_user_model,authenticate
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
 
+import re
+
+
 
 from . import models
 
@@ -14,16 +17,16 @@ class UserForm(ModelForm):
 
 
 class UserRegistrationForm(UserCreationForm):
-    email = forms.EmailField(help_text="A valid email :))", required=True)
-    username = forms.CharField(help_text="Helped", required=True)
+    #email = forms.EmailField(help_text="A valid email :))", required=True)
+    username = forms.EmailField(label="Email pero es username",help_text="Helped")
 
     class Meta:
         model = get_user_model()
-        fields = ['first_name','last_name','username','email','password1','password2']
+        fields = ['first_name','last_name','username','password1','password2']
 
     def save(self, commit=True):
         user =super(UserRegistrationForm,self).save(commit=False)
-        user.email = self.cleaned_data['email']
+        #user.email = self.cleaned_data['email']
 
         if commit:
             user.save()
@@ -31,7 +34,7 @@ class UserRegistrationForm(UserCreationForm):
     
 
 class EmailAuthenticationForm(forms.Form):
-    email = forms.EmailField(label='Email', max_length=255)
+    email = forms.EmailField(label='Email', max_length=255,required=True)
     password = forms.CharField(label= 'Password',widget=PasswordInput)
 
     def __init__(self, *args,**kwards):
@@ -39,18 +42,18 @@ class EmailAuthenticationForm(forms.Form):
         super().__init__(*args,**kwards)
 
     def clean(self):
-        print("cleaaaaan")
         cleaned_data = super().clean()
         email = cleaned_data.get('email')
         password = cleaned_data.get('password')
 
-        print("email",email)
-        print("pass",password)
+        # print("email",email)
+        # print("pass",password)
 
         if email and password:
             self.user_cache = authenticate( username=email,password=password)
             if self.user_cache is None:
                 raise forms.ValidationError("Credenciales invalidas")
+            
             
         return self.cleaned_data
     
