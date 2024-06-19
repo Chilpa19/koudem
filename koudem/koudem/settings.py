@@ -26,9 +26,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o(w)kc$sq8$u&lhl!se*#lyflm2%&@s30z^)yl7h(^korh7lmu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 MEDIA_URL = '/media/'
@@ -91,16 +91,28 @@ WSGI_APPLICATION = 'koudem.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'koudem_production',
+#         'USER': 'martin',
+#         'PASSWORD': 'gordo1968',
+#         'HOST': 'localhost',
+#         'PORT':5432
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'koudem_production',
-        'USER': 'martin',
-        'PASSWORD': 'gordo1968',
-        'HOST': 'localhost',
-        'PORT':'5432'
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        
+        'HOST': 'db_postgres',
+        'PORT':5432
     }
 }
+
 
 
 # Password validation
@@ -139,6 +151,7 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
+STATIC_ROOT='/code/path/'
 
 STATICFILES_DIRS=[
     BASE_DIR / "static",
