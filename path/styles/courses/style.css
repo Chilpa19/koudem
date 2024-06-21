@@ -1,0 +1,76 @@
+/* styles.css */
+
+/* Estilos generales del contenedor */
+.course-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Estilos de cada tarjeta de curso */
+.course-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    max-width: 300px;
+    width: 100%;
+    transition: transform 0.3s;
+}
+
+.course-card:hover {
+    transform: translateY(-10px);
+}
+
+/* Estilos de la imagen del curso */
+.course-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+/* Estilos del contenido del curso */
+.course-content {
+    padding: 15px;
+}
+
+.course-title {
+    font-size: 1.5em;
+    margin: 0 0 10px;
+}
+
+.course-description {
+    font-size: 1em;
+    color: #666;
+    margin: 0 0 15px;
+}
+
+/* Estilos del botón */
+.course-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 0.3s;
+}
+
+.course-button:hover {
+    background-color: #0056b3;
+}
+
+/* Estilos responsivos */
+@media (max-width: 768px) {
+    .course-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .course-card {
+        max-width: 90%;
+    }
+}

@@ -26,9 +26,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o(w)kc$sq8$u&lhl!se*#lyflm2%&@s30z^)yl7h(^korh7lmu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8000",  # Añade aquí los orígenes permitidos
+    "https://tuotrodominio.com",
+    # Añade más orígenes si es necesario
+]
+
 
 
 MEDIA_URL = '/media/'
@@ -65,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 
 ROOT_URLCONF = 'koudem.urls'
@@ -107,8 +115,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
         'USER': 'postgres',
-        
         'HOST': 'db_postgres',
+        'PASSWORD': 'postgres',
         'PORT':5432
     }
 }
@@ -151,7 +159,7 @@ USE_TZ = True
 
 
 STATIC_URL = 'static/'
-STATIC_ROOT='/code/path/'
+STATIC_ROOT='/code/static/'
 
 STATICFILES_DIRS=[
     BASE_DIR / "static",
@@ -167,3 +175,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = 'portal'
 LOGOUT_REDIRECT_URL = 'dashboard'
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+
+]
+
+CSRF_COOKIE_SECURE=False
+
+
+# CSRF_COOKIE_DOMAIN = 'localhost'
+
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'http')
+
+#CSRF_COOKIE_SECURE = True  # Si estás usando HTTPS
+CSRF_COOKIE_HTTPONLY = True
