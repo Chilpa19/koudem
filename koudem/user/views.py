@@ -4,24 +4,16 @@ from django.shortcuts import render
 #Mensajes
 from django.contrib import messages
 
+from django.contrib.auth.decorators import login_required
+
 from .form import UserForm, UserRegistrationForm, EmailAuthenticationForm
 from django.contrib.auth import logout,login
 
-# def login(request):
-#     print("Loginnnnn")
-#     if request.method=='GET':
-#         form=UserForm()
-#         context={"form":form}
-#         return render(request,"./users/login.html",context)
-#     else:
-#         username=request.POST['username']
-#         context={"username":username}
-#         return render(request,'./test.html',context)
-    
-
+@login_required
 def exit(request):
     logout(request)
     return redirect('dashboard')
+
 
 def register(request):
     print("Registration")
@@ -42,15 +34,12 @@ def register(request):
         form = UserRegistrationForm()
     return render(request=request, template_name="./registration/registration.html",context={"form":form})
 
-    
+
 def custom_login(request):
     print("Custom, works")
     if request.method == 'POST':
         print("Post")
         form = EmailAuthenticationForm(request.POST)
-        #print(form.cleaned_data['username'])
-        #print(form.get("username"))
-
 
         if form.is_valid():
             user = form.get_user()

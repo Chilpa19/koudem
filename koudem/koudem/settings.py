@@ -14,19 +14,23 @@ from pathlib import Path
 from django.conf import settings
 from django.conf.urls.static import static
 import os
+import environ
+
+env = environ.Env()
+
+# Lee el archivo .env si existe
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+print("SECRET_KEY:", env('SECRET_KEY'))
 
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o(w)kc$sq8$u&lhl!se*#lyflm2%&@s30z^)yl7h(^korh7lmu'
+SECRET_KEY = env.str('SECRET_KEY')
+#SECRET_KEY = "django-insecure-o(w)kc$sq8$u&lhl!se*#lyflm2%&@s30z^)yl7h(^korh7lmu"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = ['*']
 
@@ -96,29 +100,10 @@ TEMPLATES = [
 WSGI_APPLICATION = 'koudem.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'koudem_production',
-#         'USER': 'martin',
-#         'PASSWORD': 'gordo1968',
-#         'HOST': 'localhost',
-#         'PORT':5432
-#     }
-# }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'HOST': 'db_postgres',
-        'PASSWORD': 'postgres',
-        'PORT':5432
-    }
+    'default': env.db(),
+
 }
 
 
