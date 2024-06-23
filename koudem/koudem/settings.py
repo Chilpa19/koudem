@@ -34,6 +34,13 @@ DEBUG = env.bool('DEBUG', default=True)
 
 ALLOWED_HOSTS = ['*']
 
+
+RECAPTCHA_PUBLIC_KEY = '6LepmP4pAAAAAO1NLx2VU1GTCQPT_gJwpWNWO8KS'
+RECAPTCHA_PRIVATE_KEY = '6LepmP4pAAAAAGcvVDT5YBYsnc9US6MoWucNj6Az'
+
+#clave_sitio_web="6LepmP4pAAAAAO1NLx2VU1GTCQPT_gJwpWNWO8KS"
+#secret_key="6LepmP4pAAAAAGcvVDT5YBYsnc9US6MoWucNj6Az"
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8000",  # Añade aquí los orígenes permitidos
     "https://tuotrodominio.com",
@@ -65,7 +72,8 @@ INSTALLED_APPS = [
     'index',
     'course',
     'menu',
-    'core'
+    'core',
+    'django_recaptcha'
 ]
 
 MIDDLEWARE = [
@@ -175,3 +183,16 @@ CSRF_COOKIE_SECURE=False
 
 #CSRF_COOKIE_SECURE = True  # Si estás usando HTTPS
 CSRF_COOKIE_HTTPONLY = True
+
+
+
+RECAPTCHA_USE_SSL = True  # opcional
+
+RECAPTCHA_PUBLIC_KEY = '6LepmP4pAAAAAO1NLx2VU1GTCQPT_gJwpWNWO8KS'
+RECAPTCHA_PRIVATE_KEY = '6LepmP4pAAAAAGcvVDT5YBYsnc9US6MoWucNj6Az'
+
+SILENCED_SYSTEM_CHECKS=['django_recaptcha.recaptcha_test_key_error']
+
+RECAPTCHA_DOMAIN = 'www.recaptcha.net'
+
+RECAPTCHA_PROXY = {'http' : 'http://127.0.0.1:8000'}

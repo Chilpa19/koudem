@@ -3,10 +3,10 @@ from django.contrib.auth.models import User
 from django.forms import ModelForm, PasswordInput
 from django.contrib.auth import get_user_model,authenticate
 from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+#from captcha.fields import ReCaptchaField
 
-import re
-
-
+from django_recaptcha.fields import ReCaptchaField 
+from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
 from . import models
 
@@ -36,6 +36,11 @@ class UserRegistrationForm(UserCreationForm):
 class EmailAuthenticationForm(forms.Form):
     email = forms.EmailField(label='Email', max_length=255,required=True)
     password = forms.CharField(label= 'Password',widget=PasswordInput)
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
+            'data-theme': 'dark',
+            'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
+        })
+    )
 
     def __init__(self, *args,**kwards):
         self.user_cache = None
