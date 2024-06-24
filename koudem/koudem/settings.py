@@ -52,12 +52,6 @@ CORS_ALLOWED_ORIGINS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,"media")
 
-STATIC_URL = 'static/'
-
-STATICFILES_DIRS=[
-    BASE_DIR / "static",
-    '/var/www/static',
-]
 
 # Application definition
 
@@ -151,7 +145,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT='/code/static/'
 
 STATICFILES_DIRS=[
@@ -196,3 +190,15 @@ SILENCED_SYSTEM_CHECKS=['django_recaptcha.recaptcha_test_key_error']
 RECAPTCHA_DOMAIN = 'www.recaptcha.net'
 
 RECAPTCHA_PROXY = {'http' : 'http://127.0.0.1:8000'}
+
+
+#Email Setting
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_FROM = "martinc1399@gmail.com"
+EMAIL_HOST_USER = "martinc1399@gmail.com"
+EMAIL_HOST_PASSWORD = "thfoiibcdenkmvpv"
+EMAIL_PORT =  587
+EMAIL_USE_TLS = True
+
+PASSWORD_RESET_TIMEOUT = 14400

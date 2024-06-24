@@ -3,13 +3,16 @@ from django.http import HttpResponse
 from django.shortcuts import render
 # from .form import UserForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout,login,get_user_model
 
 
 def portal(request):
+
     if request.method=='POST':
         username=request.POST['username']
 
     context={"username":" "}
+    
     return render(request,'menu/portal.html',context)
 
 

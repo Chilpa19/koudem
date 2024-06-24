@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.forms import ModelForm, PasswordInput
 from django.contrib.auth import get_user_model,authenticate
-from django.contrib.auth.forms import UserCreationForm,AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,SetPasswordForm, PasswordResetForm
 #from captcha.fields import ReCaptchaField
 
 from django_recaptcha.fields import ReCaptchaField 
@@ -51,9 +51,6 @@ class EmailAuthenticationForm(forms.Form):
         email = cleaned_data.get('email')
         password = cleaned_data.get('password')
 
-        # print("email",email)
-        # print("pass",password)
-
         if email and password:
             self.user_cache = authenticate( username=email,password=password)
             if self.user_cache is None:
@@ -64,4 +61,27 @@ class EmailAuthenticationForm(forms.Form):
     
     def get_user(self):
         return self.user_cache
+
+class SetPasswordForm(SetPasswordForm):
+
+    class Meta:
+        model = get_user_model()
+        fields = ['new_password1','new_password2']
+
+
+class PasswordResetForm(PasswordResetForm):
+    
+        
+    def __init__(self, *args,**kwards):
+        super(PasswordResetForm,self).__init__(*args,**kwards)
+
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
+            'data-theme': 'dark',
+            'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
+        })
+    )
+
+
+
+
 
