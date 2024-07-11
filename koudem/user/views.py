@@ -70,7 +70,8 @@ def register(request):
             user.save()
             activateEmail(request, user, form.cleaned_data.get('username'))
             #messages.success(request,"Ejemplo de succes")
-            return redirect('custom_login')
+            #return redirect('custom_login')
+            return render(request=request, template_name="./users/verificationRegister.html",context={})
         else:
             for error in list(form.errors.values()):
                 messages.error(request,error)
