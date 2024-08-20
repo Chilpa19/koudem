@@ -15,7 +15,7 @@
 
         <div class="course-container">
 
-            {{ id }}
+            {{ course.id }}
             {% comment %} {% for course in courses %}
                 <div class="course-card">
                     <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
@@ -26,7 +26,15 @@
                     </div>
                 </div>
             {% endfor %} {% endcomment %}
+
+            {{ course.name }}
+
+
         </div>
+
+        <a href="{% url 'payment_method' user_id=user.id course_id=course.id %}">
+            <button>Inscribir</button>
+        </a>
     </body>
 
 

@@ -202,3 +202,7 @@ def passwordResetConfirm(request, uidb64, token):
 
     messages.error(request, "SOmethis went wrong")
     return redirect('portal')
+
+def getUser(request,id):
+    User = get_user_model()
+    user = User.objects.get(pk=id)

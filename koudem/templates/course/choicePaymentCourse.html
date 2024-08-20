@@ -1,0 +1,44 @@
+{% extends "menu/base_dashboard.html" %}
+{% load static %}
+
+
+
+{% block content %}
+
+<html>
+    <link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
+<head>
+    <title>Course List</title>
+</head>
+<body>
+    <h1>Payment course</h1>
+
+        <div class="course-container">
+
+            {{ course.id }}
+
+            <h1> Hola {{user.first_name}} . Felicidades, estas aun solo paso de inscribirte al tu curso de {{ course.name }}</h1>
+
+            {{ course.name }}
+
+
+            <div>
+                <div>
+                    <a href="https://wa.me/525522495140?text=Hola,%20estoy%20interesado%20en%20tu%20producto" target="_blank">
+                        Enviar mensaje por WhatsApp
+                    </a>
+                    
+                </div>
+                <div>
+                    Paypal
+                </div>
+            </div>
+
+
+        </div>
+
+    </body>
+
+
+
+{% endblock %}
