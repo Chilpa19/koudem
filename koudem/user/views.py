@@ -111,7 +111,7 @@ def custom_login(request):
 
     return render(request,"users/login.html",{"form":form})
 
-@login_required
+
 def password_change(request):
     user = request.user
     if request.method == 'POST':
@@ -127,6 +127,7 @@ def password_change(request):
     return render(request, 'users/password_reset_confirm.html', {'form':form})
 
 def password_reset(request):
+    print("Gets")
     if request.method == 'POST':
         form = PasswordResetForm(request.POST)
         if form.is_valid():
@@ -151,14 +152,13 @@ def password_reset(request):
                     print("Se envia correo")
                     messages.success(request,
                     """
-                        <h2>Password Reset</h2>
-                        <p>Hola desde el passwor reset</p>
+                        Se envia con exito el correo
                     """)
                 else:
 
                     messages.error(request, "Problem sending")
                     print(messages.error(request, "Problem sending"))
-            return redirect("portal")
+            return render(request,"users/sending_confirmation.html",{'user':associated_user.username})
      
         for key,error in list(form.errors.items()):
             if key=='captcha' and error[0]=="This field is required.":
@@ -194,6 +194,7 @@ def passwordResetConfirm(request, uidb64, token):
                 for error in list(form.error.values()):
                     messages.error(request,error)
                     print(error)
+            return redirect('/user/login/')
         form=SetPasswordForm(user)
         return render(request,"users/password_reset_confirm.html",{'form':form})
     else:
@@ -201,7 +202,7 @@ def passwordResetConfirm(request, uidb64, token):
         print("<Link expiró")
 
     messages.error(request, "SOmethis went wrong")
-    return redirect('portal')
+    return redirect('/user/login/')
 
 def getUser(request,id):
     User = get_user_model()

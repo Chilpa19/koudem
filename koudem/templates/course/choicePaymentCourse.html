@@ -24,9 +24,15 @@
 
             <div>
                 <div>
-                    <a href="https://wa.me/525522495140?text=Hola,%20estoy%20interesado%20en%20tu%20producto" target="_blank">
+                    {% comment %} <a href="https://wa.me/525522495140?text=Hola,%20estoy%20interesado%20en%20tu%20producto" target="_blank">
                         Enviar mensaje por WhatsApp
+                    </a> {% endcomment %}
+
+                    <a href="{% url 'inscription_user' user_id=user.id course_id=course.id option=2 %}">
+                        <button>Inscribir por medio de WhatsApp</button>
                     </a>
+
+
                     
                 </div>
                 <div>

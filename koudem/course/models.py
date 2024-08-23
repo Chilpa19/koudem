@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import date
-from user import models as modelsU
+from django.contrib.auth.models import User
+# from user.models import User
 
 
 
@@ -17,19 +18,21 @@ class Course(models.Model):
     def __str__(self):
         return self.name
     
-
 class Inscription(models.Model):
-    alumno = models.ForeignKey(modelsU.User, on_delete=models.CASCADE)
+    alumno = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     date_inscription = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=50,null=False,blank=False, default="Postulado")
     # Puedes añadir otros campos relevantes, como la calificación, estado de la inscripción, etc.
     
     class Meta:
         unique_together = ('alumno', 'course')  # Para asegurar que no haya inscripciones duplicadas
 
     def __str__(self):
-        return f"{self.alumno} inscrito en {self.curso}"
+        return f"{self.alumno} inscrito en {self.course}"
     
+    
+
 
 
 

@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from .form import *
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -25,7 +25,7 @@ def create(request):
         return HttpResponse("Curso NO Saved :c")
 
 
-@login_required    
+@login_required(login_url='/user/login/')    
 def courses_list(request):
     courses = Course.objects.all()
     print(courses)
@@ -51,16 +51,29 @@ def courses_view(request, course_id):
     return render(request, "./course/viewCourse.html",context)
 
 
-# @login_required
-# def inscribir_alumno(request, alumno_id, curso_id):
-#     alumno = get_object_or_404(User, id=alumno_id)
-#     curso = get_object_or_404(Course, id=curso_id)
+@login_required
+def inscription_user(request, user_id, course_id, option):
+    #user = get_object_or_404(User, id=user_id)
+    curso = get_object_or_404(Course, id= course_id)
+
+    #User = get_user_model()
+    alumno = User.objects.get(pk=user_id)
+
+    alumno=request.user
+
+    inscription, created = Inscription.objects.get_or_create( course=curso,alumno=alumno)
+
+    if option == 1:
+        url_whatsapp = "https://wa.me/525522495140?text=Hola,%20estoy%20interesado%20en%20tu%20producto"
+        return HttpResponseRedirect(url_whatsapp)
+    else:
+        print("Opcion 2")
+        url_whatsapp = "https://wa.me/525522495140?text=Hola,%20estoy%20interesado%20en%20tu%20producto"
+        return HttpResponseRedirect(url_whatsapp)
+
     
-#     # Crear la inscripción si no existe
-#     inscripcion, created = Inscription.objects.get_or_create(alumno=alumno, curso=curso)
+    # Redirigir a alguna página después de la inscripción
     
-#     # Redirigir a alguna página después de la inscripción
-#     return redirect('nombre_de_tu_vista')
 
 
 
@@ -81,6 +94,19 @@ def payment_method(request, user_id, course_id):
     }
    
     return render(request, "./course/choicePaymentCourse.html",context)
+
+
+def payment_course(user_id, course_id):
+    usuario = get_object_or_404(User, id=user_id)
+    curso = get_object_or_404(Course, id=course_id)
+    inscripcion = get_object_or_404(Inscription, usuario=usuario, curso=curso)
+    
+    # Modifica el atributo
+    inscripcion.estado = 'Completado'  # Ejemplo de actualización
+    
+    # Guarda los cambios
+    inscripcion.save()
+
 
 
 
