@@ -14,6 +14,7 @@ class Course(models.Model):
     start_date=models.DateField(default=date.today())
     end_date=models.DateField(default=date.today())
     image = models.ImageField(upload_to='images/',default="",null=True)
+    pdf_file = models.FileField(upload_to='pdfs/', null=True, blank=True)
 
     def __str__(self):
         return self.name

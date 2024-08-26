@@ -16,9 +16,23 @@
 </head>
 <body>
 
-
+        <h1>Todos los cursos</h1>
         <div class="course-container">
             {% for course in courses %}
+                <div class="course-card">
+                    <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
+                    <div class="course-content">
+                        <h3 class="course-title">{{ course.name }}</h3>
+                        <p class="course-description">{{ course.start_date }}</p>
+                        <a href="{% url "courses_view" course.id %} " class="course-button">Más información</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <h1>Mis cursos</h1>
+        <div class="course-container">
+            {% for course in courses_user %}
                 <div class="course-card">
                     <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
                     <div class="course-content">

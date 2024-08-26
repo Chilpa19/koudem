@@ -54,13 +54,13 @@ def activateEmail(request,user,to_email):
 @login_required
 def exit(request):
     logout(request)
-    return redirect('dashboard')
+    return redirect('portal')
 
 
 def register(request):
     print("Registration")
     if request.user.is_authenticated:
-        return redirect('dashboard/')
+        return redirect('portal/')
     
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)

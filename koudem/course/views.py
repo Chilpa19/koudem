@@ -27,12 +27,28 @@ def create(request):
 
 @login_required(login_url='/user/login/')    
 def courses_list(request):
+    #Todos los cursos
     courses = Course.objects.all()
     print(courses)
     for i in courses:
         print(i.image)
-    context={"courses":courses}
    
+   #Cursos enrolados
+    user=request.user
+    inscriptions = Inscription.objects.filter(alumno=user)
+
+    print("Incripciones de usuario",inscriptions)
+
+    cursos_user = [i.course for i in inscriptions]
+
+    # for i in inscriptions:
+    #     print("Un curso",i.course,type(i.course))
+    #     print(i.__dict__)
+
+
+
+    context={"courses":courses,
+             "courses_user":cursos_user}
     return render(request, "./course/displayCourse.html",context)
 
 
