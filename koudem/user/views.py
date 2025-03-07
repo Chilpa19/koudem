@@ -54,7 +54,7 @@ def activateEmail(request,user,to_email):
 @login_required
 def exit(request):
     logout(request)
-    return redirect('portal')
+    return redirect('dashboard')
 
 
 def register(request):

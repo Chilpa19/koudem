@@ -1,18 +1,49 @@
-version: "3"
+
+
+# services:
+#   app:
+#     build: .
+#     volumes:
+#      - .:/django
+#     ports:
+#      - 8000:8000
+#     image: application:django
+#     container_name: app_container
+#     command: gunicorn koudem.wsgi.application --bind 0.0.0.0:8000
+  
+
+
+
+    
+
+
+
+
+
+
+
+
+#=========================================
+
 
 services:
   db_postgres:
     image: postgres:14.3
+    env_file:
+      - /koudem/.env
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=koudem_db
+      - POSTGRES_DB= koudem_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
      
 
   django_app:
     build: .
+    env_file:
+      - koudem/.env
     volumes:
       - static:/code/static
       - .:/code
@@ -21,6 +52,8 @@ services:
 
   nginx:
     image: nginx:1.13
+    env_file:
+      - koudem/.env
     ports:
       - 8000:80
     volumes:

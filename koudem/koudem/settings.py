@@ -153,6 +153,13 @@ STATICFILES_DIRS=[
     '/var/www/static',
 ]
 
+# settings.py
+# STATIC_URL = '/static/'
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static",
+# ]
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -204,3 +211,9 @@ EMAIL_USE_TLS = True
 PASSWORD_RESET_TIMEOUT = 14400
 
 LOGIN_URL= '/user/login/'
+
+# Establecer el huso horario global
+TIME_ZONE = 'America/Mexico_City'  # Ejemplo para Ciudad de México
+
+# Activar soporte para husos horarios
+USE_TZ = True  # True habilita el soporte de husos horarios

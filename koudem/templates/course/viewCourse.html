@@ -32,17 +32,27 @@
 
         </div>
 
-        <a href="{% url 'payment_method' user_id=user.id course_id=course.id %}">
-            <button>Inscribirme al curso</button>
-        </a>
+
 
         <h1>Temario</h1>
 
         {% if course.pdf_file %}
-            <a href="{{ course.pdf_file.url }}">Descargar PDF</a>
+            <a href="{{ course.pdf_file.url }}" target="_blank">Descargar PDF</a>
         {% else %}
             <p>No hay PDF disponible para este curso.</p>
         {% endif %}
+
+
+        {% if exits %}
+            Ya estas pregistrado, concluye tu registro  <a href="{% url 'preinscription_course' user_id=user.id course_id=course.id %}">aquí</a>
+        {% else %}
+            <a href="{% url 'preinscription_course' user_id=user.id course_id=course.id %}">
+                <button>Inscribirme al curso</button>
+            </a>
+        {% endif %}
+
+            <p>Estado: {{exits}}</p>
+
 
     </body>
 

@@ -4,7 +4,7 @@ from .form import *
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout,login,get_user_model
-
+from datetime import datetime
 
 def create(request):
     
@@ -40,31 +40,47 @@ def courses_list(request):
     print("Incripciones de usuario",inscriptions)
 
     cursos_user = [i.course for i in inscriptions]
-
-    # for i in inscriptions:
-    #     print("Un curso",i.course,type(i.course))
-    #     print(i.__dict__)
-
-
-
+    
     context={"courses":courses,
              "courses_user":cursos_user}
-    return render(request, "./course/displayCourse.html",context)
+
+    response = render(request, "./course/displayCourse.html", context)
+
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+
+    
+    return response
 
 
 
 @login_required    
 def courses_view(request, course_id):
-
-        # Obtener el curso con el ID dado
+    user=request.user
+    # Obtener el curso con el ID dado
     course = get_object_or_404(Course, id=course_id)
-    
+
+    inscription_exists = Inscription.objects.filter(alumno=user, course=course)
+
+    try:
+        statusInscri=inscription_exists[0].status
+    except IndexError:
+        statusInscri=None
     # Pasar el curso al contexto
     context = {
         'course': course,
+        "exits" : statusInscri
     }
+
+    response = render(request, "./course/viewCourse.html", context)
+
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+
    
-    return render(request, "./course/viewCourse.html",context)
+    return response
 
 
 @login_required
@@ -77,7 +93,11 @@ def inscription_user(request, user_id, course_id, option):
 
     alumno=request.user
 
-    inscription, created = Inscription.objects.get_or_create( course=curso,alumno=alumno)
+    inscription, created = Inscription.objects.get_or_create( course=curso,alumno=alumno,date_inscription=datetime.now())
+    # inscription.date_inscription = date.today()
+    # inscription.save()
+    print("Inscripcion",inscription.__dict__)
+
 
     if option == 1:
         url_whatsapp = "https://wa.me/525522495140?text=Hola,%20estoy%20interesado%20en%20tu%20producto"
@@ -90,7 +110,30 @@ def inscription_user(request, user_id, course_id, option):
     
     # Redirigir a alguna página después de la inscripción
     
+@login_required
+def preinscription_course(request, user_id, course_id):
+    print("Preinscription")
+    cursoP = get_object_or_404(Course, id=course_id)
+    alumnoP = get_object_or_404(User, id=user_id)
+    inscription = Inscription.objects.filter(course=cursoP, alumno=alumnoP).first()
 
+    if not inscription:
+        inscription = Inscription.objects.create(
+            course=cursoP,
+            alumno=alumnoP,
+            date_inscription=datetime.now()
+        )
+        print("Inscripción creada")
+
+    # Si la inscripción ya existe, puedes mostrar un mensaje o manejarlo como prefieras
+    else:
+        print("La inscripción ya existe")
+
+    context = {
+        'course': cursoP,
+        'user': alumnoP
+    }
+    return render(request, "./course/preinscriptionCourse.html",context)
 
 
 @login_required

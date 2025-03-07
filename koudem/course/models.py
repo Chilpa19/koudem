@@ -22,7 +22,7 @@ class Course(models.Model):
 class Inscription(models.Model):
     alumno = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date_inscription = models.DateTimeField(auto_now_add=True)
+    date_inscription = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=50,null=False,blank=False, default="Postulado")
     # Puedes añadir otros campos relevantes, como la calificación, estado de la inscripción, etc.
     

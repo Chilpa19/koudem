@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path,include
-
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
 
@@ -13,4 +13,4 @@ urlpatterns = [
     path("password_reset", views.password_reset, name="password_resete"),
     path("reset/<uidb64>/<token>", views.passwordResetConfirm, name="password_resete_confirm"),
 
-]
+]+ staticfiles_urlpatterns()

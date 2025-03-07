@@ -1,34 +1,30 @@
 {% extends "include/base_auth.html" %}
 
+
 <!DOCTYPE html>
 
 
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario de Contacto</title>
-</head>
-{% block content %}
 
-<body>
+<title>Formulario de Contacto</title>
+    
+{% block content %}
     {% include 'include/messaging.html' %}
 
-    <h1>Login Custom</h1>
-    <form  method="post">
+    <h1 class="text-center">Login Custom2</h1>
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <button class="btn btn-primary">Botón primario</button>
+        <button class="btn btn-secondary">Botón secundario</button>
+        <button class="btn btn-success">Botón de éxito</button>
+    </div>
+    
+    <form method="post" class="mt-4">
         {% csrf_token %}
-
         {{ form.as_p }}
-
-        <input type="submit" value="Login">
+        <button type="submit" class="btn btn-primary">Login</button>
     </form>
-</body>
 
-
-Already have an account? <li><a href="{% url "register" %}">Sign up</a></li>
-
-<li><a href="{% url "password_resete" %}">Reset password</a></li>
-
+    <div class="mt-3">
+        <p>Already have an account? <a href="{% url 'register' %}">Sign up</a></p>
+        <p><a href="{% url 'password_resete' %}">Reset password</a></p>
+    </div>
 {% endblock %}
-
-</html>
