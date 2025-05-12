@@ -1,13 +1,38 @@
-{% extends "menu/base_dashboard.html" %}
+{% extends "include/base_menu.html" %}
+{% load static %}
 
 {% block content %}
+
+<html>
+    <link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
+</html>
 
     <div>
        <h1>Portal</h1>
     </div>
+
+    
+    <img src="https://test-koudem.s3.us-east-2.amazonaws.com/Chivas.png" alt="Imagen desde S3" width="300" height="200">
+
+    
     <a href="{% url "courses_list" %}">Ver cursos</a>
 
     <a href="{% url "create" %}">Create</a>
+
+    <h1>Todos los cursos</h1>
+
+    <div class="course-container">
+        {% for course in courses %}
+            <div class="course-card">
+                <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
+                <div class="course-content">
+                    <h3 class="course-title">{{ course.name }}</h3>
+                    <p class="course-description">{{ course.level }}</p>
+                    <a href="{% url "courses_view" course.id %} " class="course-button">Más información</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 
 

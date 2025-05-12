@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .form import UserForm, UserRegistrationForm, EmailAuthenticationForm, SetPasswordForm, PasswordResetForm
 from django.contrib.auth import logout,login,get_user_model
+from django.urls import reverse
 
 #Mensajes
 from django.contrib import messages
@@ -58,6 +59,8 @@ def exit(request):
 
 
 def register(request):
+    if request.user.is_authenticated:
+        return redirect("portal")
     print("Registration")
     if request.user.is_authenticated:
         return redirect('portal/')
@@ -80,8 +83,10 @@ def register(request):
     return render(request=request, template_name="./registration/registration.html",context={"form":form})
 
 
-def custom_login(request):
-    print("Custom, works")
+def custom_login(request,course_id=None):
+    print("Login custom")
+    if request.user.is_authenticated:
+        return redirect("portal")
     if request.method == 'POST':
         print("Post")
         form = EmailAuthenticationForm(request.POST)
@@ -89,10 +94,13 @@ def custom_login(request):
         if form.is_valid():
             user = form.get_user()
             print(user,"user")
-            if user is not None:
+            if user is not None and course_id==None:
                 print("Authenticated")
                 login(request,user)
                 return redirect('portal')
+            else:
+                login(request,user)
+                return redirect(reverse('courses_view', args=[course_id]))
         else:
             print("mo valid")
             print(len(list(form.errors)))
@@ -113,6 +121,7 @@ def custom_login(request):
 
 
 def password_change(request):
+    print("Password_change")
     user = request.user
     if request.method == 'POST':
         form = SetPasswordForm(user, request.POST)
@@ -128,6 +137,8 @@ def password_change(request):
 
 def password_reset(request):
     print("Gets")
+    if request.user.is_authenticated:
+        return redirect("portal")
     if request.method == 'POST':
         form = PasswordResetForm(request.POST)
         if form.is_valid():

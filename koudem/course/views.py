@@ -55,19 +55,24 @@ def courses_list(request):
 
 
 
-@login_required    
+   
 def courses_view(request, course_id):
+    print("View courseeeeee")
     user=request.user
+    course=""
+    statusInscri=""
+
     # Obtener el curso con el ID dado
-    course = get_object_or_404(Course, id=course_id)
+    if request.user.is_authenticated:
+        
+        inscription_exists = Inscription.objects.filter(alumno=user, course=course_id)
 
-    inscription_exists = Inscription.objects.filter(alumno=user, course=course)
-
-    try:
-        statusInscri=inscription_exists[0].status
-    except IndexError:
-        statusInscri=None
+        try:
+            statusInscri=inscription_exists[0].status
+        except IndexError:
+            statusInscri=None
     # Pasar el curso al contexto
+    course = get_object_or_404(Course, id=course_id)
     context = {
         'course': course,
         "exits" : statusInscri
@@ -78,7 +83,6 @@ def courses_view(request, course_id):
     response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
-
    
     return response
 
@@ -111,8 +115,10 @@ def inscription_user(request, user_id, course_id, option):
     # Redirigir a alguna página después de la inscripción
     
 @login_required
-def preinscription_course(request, user_id, course_id):
+def preinscription_course(request, course_id):
+    
     print("Preinscription")
+    user_id=request.user.id
     cursoP = get_object_or_404(Course, id=course_id)
     alumnoP = get_object_or_404(User, id=user_id)
     inscription = Inscription.objects.filter(course=cursoP, alumno=alumnoP).first()

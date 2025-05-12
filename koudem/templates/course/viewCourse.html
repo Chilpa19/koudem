@@ -1,21 +1,45 @@
-{% extends "menu/base_dashboard.html" %}
+{% extends "include/base_menu.html" %}
 {% load static %}
 
 
 
 {% block content %}
 
-<html>
     <link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
 <head>
     <title>Course List</title>
+    <script>
+        // Función para actualizar el reloj
+        function updateClock() {
+            var now = new Date();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+
+            // Asegurarse de que siempre haya dos dígitos para minutos y segundos
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+
+            var timeString = hours + ':' + minutes + ':' + seconds;
+
+            // Actualiza el contenido de la etiqueta con id="clock"
+            document.getElementById('clock').innerText = timeString;
+        }
+
+        // Actualiza el reloj cada segundo
+        setInterval(updateClock, 1000);
+
+        // Ejecuta la función una vez al cargar la página
+        window.onload = updateClock;
+    </script>
+
 </head>
 <body>
+    <h1>Reloj en tiempo real</h1>
+    <p id="clock"></p> 
     <h1>Vista curso</h1>
 
         <div class="course-container">
-
-            {{ course.id }}
             {% comment %} {% for course in courses %}
                 <div class="course-card">
                     <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
@@ -26,36 +50,74 @@
                     </div>
                 </div>
             {% endfor %} {% endcomment %}
+            <div class="course-card">
+                <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
+               
+            </div>
 
-            {{ course.name }}
-
+            <div class="curso-info">
+                <h2>Curso de Programación</h2>
+                
+                <div class="chips-container">
+                    <span  class="badge bg-primary">Nivel: {{ course.level }}</span>
+                    <span class="badge bg-info">Duración: {{ course.start_date }}</span>
+                    <span class="badge bg-success">Descripción: {{ course.description }} </span>
+                    <br>
+                    <br>
+                    <span class="badge bg-success">Descripción: {{ exits }} </span>
+                </div>
+            </div>
+            
 
         </div>
 
 
 
-        <h1>Temario</h1>
+        <h1>Contenido</h1>
 
         {% if course.pdf_file %}
-            <a href="{{ course.pdf_file.url }}" target="_blank">Descargar PDF</a>
+            
+            <a href="{{ course.pdf_file.url }}" target="_blank" class="btn-temario" >
+                Descargar Temario
+            </a>
+            
         {% else %}
             <p>No hay PDF disponible para este curso.</p>
         {% endif %}
 
-
-        {% if exits %}
-            Ya estas pregistrado, concluye tu registro  <a href="{% url 'preinscription_course' user_id=user.id course_id=course.id %}">aquí</a>
+        
+        {% if user.is_authenticated %}
+            {% if exits %}
+                <div>
+                    Ya estas pregistrado, concluye tu registro  <a href="{% url 'preinscription_course' course_id=course.id %}">aquí</a>
+                </div>
+            {% else %}
+                <a href="{% url 'preinscription_course'  course_id=course.id %}">
+                    <button>Inscribirme al curso</button>
+                </a>
+            {% endif %}
         {% else %}
-            <a href="{% url 'preinscription_course' user_id=user.id course_id=course.id %}">
-                <button>Inscribirme al curso</button>
-            </a>
+                <a href="{% url 'custom_login' course.id %}">
+                    <button>Inscribirme al curso</button>
+                </a>
+        
         {% endif %}
 
-            <p>Estado: {{exits}}</p>
+            
 
 
     </body>
 
 
+    <script>
+        window.addEventListener("pageshow", function(event) {
+            if (event.persisted) {  // Si la página fue cargada desde la caché del navegador
+                window.location.reload();  // Recargar la página
+            }
+        });
+      </script>
+      
+
 
 {% endblock %}
+

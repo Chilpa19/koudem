@@ -46,6 +46,24 @@ header {
     text-decoration: underline;
 }
 
+/* Estilo para el enlace convertido en botón */
+.btn-temario {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff; /* Color de fondo */
+    color: white; /* Color del texto */
+    text-align: center;
+    text-decoration: none; /* Quitar subrayado */
+    border-radius: 5px; /* Bordes redondeados */
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.btn-temario:hover {
+    background-color: #0056b3; /* Cambiar el fondo al pasar el mouse */
+}
+
+
 /* Estilos responsivos */
 @media (max-width: 768px) {
     .header-container {

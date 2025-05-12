@@ -6,6 +6,7 @@ from . import views
 
 urlpatterns = [
     path('login/', views.custom_login,name="custom_login"),
+    path('login/<int:course_id>/',views.custom_login,name="custom_login"),
     path('logout/', views.exit ,name="exit"),
     path("register/",views.register, name="register"),
     path("activate/<uidb64>/<token>",views.activate, name="activate"),

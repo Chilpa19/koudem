@@ -1,11 +1,6 @@
 {% extends "menu/base_dashboard.html" %}
 {% load static %}
 
-
-
-
-
-
 {% block content %}
 <html>
     <link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
@@ -42,7 +37,7 @@
                     </div>
                 </div>
 
-                <div class="card">
+                {% comment %} <div class="card">
                     <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.name }}">
                     <div class="card-body">
                         <span class="badge bg-primary">{{ course.category }}</span>
@@ -57,7 +52,7 @@
                         </span>
                       
                     </div>
-                </div>
+                </div> {% endcomment %}
                 
             {% endfor %}
         </div>
