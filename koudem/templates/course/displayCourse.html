@@ -1,4 +1,4 @@
-{% extends "menu/base_dashboard.html" %}
+{% extends "include/base_menu.html" %}
 {% load static %}
 
 {% block content %}
@@ -19,7 +19,7 @@
                     <div class="course-content">
                         <h3 class="course-title">{{ course.name }}</h3>
                         <p class="course-description">{{ course.start_date }}</p>
-                        <a href="{% url "courses_view" course.id %} " class="course-button">Más información</a>
+                        <a href="{% url "courses_view" course.slug %} " class="course-button">Más información</a>
                     </div>
                 </div>
             {% endfor %}
@@ -33,26 +33,10 @@
                     <div class="course-content">
                         <h3 class="course-title">{{ course.name }}</h3>
                         <p class="course-description">{{ course.start_date }}</p>
-                        <a href="{% url "courses_view" course.id %} " class="course-button">Más información</a>
+                        <a href="{% url "courses_view" course.slug %} " class="course-button">Más información</a>
                     </div>
                 </div>
 
-                {% comment %} <div class="card">
-                    <img src="{{ course.image.url }}" class="card-img-top" alt="{{ course.name }}">
-                    <div class="card-body">
-                        <span class="badge bg-primary">{{ course.category }}</span>
-                        <h5 class="card-title">{{ course.name }}</h5>
-                        <p class="text-muted">Nivel: {{ course.level }}</p>
-                        <p class="fw-bold {% if course.cost == '0.0' %} text-success {% endif %}">
-                            {% if course.cost == '0.0' %} GRATUITO {% else %} ${{ course.cost }} {% endif %}
-                        </p>
-                        <p class="text-muted">Inicio: {{ course.start_date }} - Fin: {{ course.end_date }}</p>
-                        <span class="badge {% if course.status == 'Disponible' %} bg-success {% elif course.status == 'Lleno' %} bg-danger {% else %} bg-warning {% endif %}">
-                            {{ course.status }}
-                        </span>
-                      
-                    </div>
-                </div> {% endcomment %}
                 
             {% endfor %}
         </div>

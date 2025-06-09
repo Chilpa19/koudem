@@ -88,11 +88,12 @@ WSGI_APPLICATION = 'koudem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'koudem_db',
-        'USER': 'postgresKoudem',
-        'PASSWORD': 'Gordo1968',
-        'HOST': 'database-koudem.c7go4c2ced6e.us-east-2.rds.amazonaws.com',
-        'PORT': '5432',
+        'NAME': 'koudem_local',
+        'USER': 'postgres',
+        'PASSWORD': 'gordo1968',
+        'HOST': 'localhost',
+        #'HOST': 'database-koudem.c7go4c2ced6e.us-east-2.rds.amazonaws.com',
+        'PORT' : 5432
     }
 }
 

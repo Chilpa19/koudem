@@ -89,10 +89,10 @@
         {% if user.is_authenticated %}
             {% if exits %}
                 <div>
-                    Ya estas pregistrado, concluye tu registro  <a href="{% url 'preinscription_course' course_id=course.id %}">aquí</a>
+                    Ya estas pregistrado, concluye tu registro  <a href="{% url 'preinscription_course' slug=course.slug %}">aquí</a>
                 </div>
             {% else %}
-                <a href="{% url 'preinscription_course'  course_id=course.id %}">
+                <a href="{% url 'preinscription_course'  slug=course.slug %}">
                     <button>Inscribirme al curso</button>
                 </a>
             {% endif %}

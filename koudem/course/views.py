@@ -56,11 +56,13 @@ def courses_list(request):
 
 
    
-def courses_view(request, course_id):
-    print("View courseeeeee")
+def courses_view(request, slug):
+    print("===========View course==========")
     user=request.user
-    course=""
     statusInscri=""
+    course = get_object_or_404(Course, slug=slug)
+    course_id = course.id
+    print("Course_id",course_id)
 
     # Obtener el curso con el ID dado
     if request.user.is_authenticated:
@@ -72,7 +74,6 @@ def courses_view(request, course_id):
         except IndexError:
             statusInscri=None
     # Pasar el curso al contexto
-    course = get_object_or_404(Course, id=course_id)
     context = {
         'course': course,
         "exits" : statusInscri
@@ -115,9 +116,15 @@ def inscription_user(request, user_id, course_id, option):
     # Redirigir a alguna página después de la inscripción
     
 @login_required
-def preinscription_course(request, course_id):
+def preinscription_course(request, slug):
+
+
     
     print("Preinscription")
+
+
+    course = get_object_or_404(Course, slug=slug)
+    course_id = course.id
     user_id=request.user.id
     cursoP = get_object_or_404(Course, id=course_id)
     alumnoP = get_object_or_404(User, id=user_id)
