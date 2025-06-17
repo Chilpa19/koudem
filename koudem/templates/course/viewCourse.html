@@ -8,7 +8,8 @@
     <link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
 <head>
     <title>Course List</title>
-    <script>
+
+    {% comment %} <script>
         // Función para actualizar el reloj
         function updateClock() {
             var now = new Date();
@@ -31,12 +32,59 @@
 
         // Ejecuta la función una vez al cargar la página
         window.onload = updateClock;
+    </script> {% endcomment %}
+
+    <script>
+        // Fecha y hora del curso en formato UTC
+        const fechaInicio = new Date("{{ course.start_date_time|date:'c' }}");  // formato ISO 8601
+
+        function actualizarCuentaRegresiva() {
+            const ahora = new Date();
+            const diferencia = fechaInicio - ahora;
+
+            console.log("Diferencia",diferencia)
+
+            const countdownEl = document.getElementById('countdown');
+            const totalSegundos = Math.floor(diferencia / 1000);
+            const dias = Math.floor(totalSegundos / 86400);
+
+            if (diferencia <= 0 && dias>=-1 ) {
+                countdownEl.innerHTML = "¡El curso ha comenzado!";
+                clearInterval(interval);
+                return;
+            }else if(dias<=-1){
+                clearInterval(interval);
+                return;
+            }
+            
+            const horas = Math.floor((totalSegundos % 86400) / 3600);
+
+            if (dias >= 1) {
+                countdownEl.innerHTML = `Faltan ${dias} día(s)`;
+            } else if (horas>=1){
+                
+                countdownEl.innerHTML = `Faltan ${horas.toString().padStart(2, '0')} horas`;
+                
+
+            }else{
+
+                const minutos = Math.floor((totalSegundos % 3600) / 60);
+                const segundos = totalSegundos % 60;
+                countdownEl.innerHTML = `EL curso comienza en ${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+
+            }
+        }
+
+        const interval = setInterval(actualizarCuentaRegresiva, 1000);
+        actualizarCuentaRegresiva();  // Llamada inicial
     </script>
+
 
 </head>
 <body>
     <h1>Reloj en tiempo real</h1>
     <p id="clock"></p> 
+    <div id="countdown"></div>
     <h1>Vista curso</h1>
 
         <div class="course-container">
@@ -64,7 +112,8 @@
                     <span class="badge bg-success">Descripción: {{ course.description }} </span>
                     <br>
                     <br>
-                    <span class="badge bg-success">Descripción: {{ exits }} </span>
+                    <span class="badge bg-success">Estatus: {{ exits }} </span>
+                    <span class="badge bg-success">Fecha de inicio: {{ course.start_date_time }} </span>
                 </div>
             </div>
             

@@ -2,10 +2,17 @@ from django.db import models
 from datetime import date
 from django.contrib.auth.models import User
 from django.utils.text import slugify
+from django.utils import timezone
+import datetime
+from django.contrib.postgres.fields import ArrayField
 
 
 
 class Course(models.Model):
+    DAY_CHOICES=[
+        ('LUN','LUNES'),
+        ('MAR','MARTES')
+    ]
     name = models.CharField(max_length=50,null=False,blank=False)
     category = models.CharField(max_length=50, null=False,blank=False)
     level =models.CharField(max_length=50, null=False,blank=False)
@@ -16,7 +23,13 @@ class Course(models.Model):
     image = models.ImageField(upload_to='images/',default="",null=True)
     pdf_file = models.FileField(upload_to='pdfs/', null=True, blank=True)
     description = models.CharField(max_length=300,null=False,blank=False,default="description")
-    slug = models.SlugField(unique=True, blank=True) 
+    slug = models.SlugField(unique=True, blank=True)
+    start_date_time = models.DateTimeField(blank=False,default=timezone.make_aware(datetime.datetime.now()))
+    days=ArrayField(models.CharField(
+        max_length=3,
+        choices=DAY_CHOICES
+    ),verbose_name="Días",blank=True,default=list)
+
 
     def save(self, *args, **kwargs):
         if not self.slug:
