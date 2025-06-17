@@ -36,11 +36,11 @@ class UserRegistrationForm(UserCreationForm):
 class EmailAuthenticationForm(forms.Form):
     email = forms.EmailField(label='Email', max_length=255,required=True)
     password = forms.CharField(label= 'Password',widget=PasswordInput)
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
-            'data-theme': 'dark',
-            'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
-        })
-    )
+    # captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
+    #         'data-theme': 'dark',
+    #         'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
+    #     })
+    # )
 
     def __init__(self, *args,**kwards):
         self.user_cache = None
