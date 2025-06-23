@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout,login,get_user_model
 # En views.py u otro archivo donde necesites usar Course
 from course.models import Course
+from django.utils import timezone
 
 
 
@@ -16,6 +17,10 @@ def portal(request):
 
     courses = Course.objects.all()
 
+    Course.objects.filter(
+        status="Open",
+        start_date_time__lte=timezone.now()
+    ).update(status="In progress")
 
     context={"username":" ",
              "courses": courses}

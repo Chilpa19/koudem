@@ -6,14 +6,15 @@ class CreateCourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ["name","category","level","cost","status",
-                  "start_date","start_date_time","end_date","image","days"
+                  "start_date","start_date_time","end_date","image", 
+                  "limit", "availability","days"
                 ]
         widgets = {
             'days': forms.CheckboxSelectMultiple(
                 choices=Course.DAY_CHOICES
             )
         }
-    cost= forms.ChoiceField(
-        label="Selecciona un precio",
-        choices=[("200","200"),("300","300")])
+    status= forms.ChoiceField(
+        label="Selecciona un estatus",
+        choices=[("Open","Open"),("Close","Close"),("In progress","In progress")])
     

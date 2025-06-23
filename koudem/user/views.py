@@ -17,6 +17,7 @@ from django.core.mail import EmailMessage
 from .tokens import account_activation_token
 
 from django.db.models.query_utils import Q
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 def activate(request,uidb64, token):
     User = get_user_model()
@@ -218,3 +219,9 @@ def passwordResetConfirm(request, uidb64, token):
 def getUser(request,id):
     User = get_user_model()
     user = User.objects.get(pk=id)
+
+
+@login_required(login_url='/user/login/')    
+def view_profile(request):
+    user = request.user
+    return render(request, 'users/perfil_usuario.html', {'user_profile': request.user})

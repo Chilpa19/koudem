@@ -19,6 +19,8 @@ class UserForm(ModelForm):
 class UserRegistrationForm(UserCreationForm):
     #email = forms.EmailField(help_text="A valid email :))", required=True)
     username = forms.EmailField(label="Email pero es username",help_text="Helped")
+    first_name = forms.CharField(required=True, max_length=30, label="First Name")
+    last_name = forms.CharField(required=True, max_length=30, label="Last Name")
 
     class Meta:
         model = get_user_model()
@@ -36,11 +38,11 @@ class UserRegistrationForm(UserCreationForm):
 class EmailAuthenticationForm(forms.Form):
     email = forms.EmailField(label='Email', max_length=255,required=True)
     password = forms.CharField(label= 'Password',widget=PasswordInput)
-    # captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
-    #         'data-theme': 'dark',
-    #         'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
-    #     })
-    # )
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
+            'data-theme': 'dark',
+            'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
+        })
+    )
 
     def __init__(self, *args,**kwards):
         self.user_cache = None

@@ -1,29 +1,22 @@
 {% extends "menu/base_dashboard.html" %}
 {% load static %}
 
-
-
-
-
-
 {% block content %}
 <html>
     <link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
 </html>
 
 <head>
-    <title>Course List</title>
+    <title>Preinscripción</title>
 </head>
 <body>
 
-    <h1>Preinscripcion</h1>
+    <h1>Preinscripción</h1>
 
+    <a href="{% url 'confirmar_pago' slug=course.slug %}">
+        <button>Pagar</button>
+    </a>
 
-
-
-
-</html>
 
 </body>
-
 {% endblock %}

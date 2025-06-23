@@ -3,6 +3,7 @@ from django.urls import path,include
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 
+# app_name='usuario'
 
 urlpatterns = [
     path('login/', views.custom_login,name="custom_login"),
@@ -13,5 +14,6 @@ urlpatterns = [
     path("password_change", views.password_change, name="password_chang"),
     path("password_reset", views.password_reset, name="password_resete"),
     path("reset/<uidb64>/<token>", views.passwordResetConfirm, name="password_resete_confirm"),
+    path('view_profile/', views.view_profile ,name="view_profile"),
 
 ]+ staticfiles_urlpatterns()

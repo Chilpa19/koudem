@@ -1,172 +1,106 @@
 {% extends "include/base_menu.html" %}
 {% load static %}
 
-
-
 {% block content %}
 
-    <link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
+<link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
+
 <head>
     <title>Course List</title>
 
-    {% comment %} <script>
-        // Función para actualizar el reloj
-        function updateClock() {
-            var now = new Date();
-            var hours = now.getHours();
-            var minutes = now.getMinutes();
-            var seconds = now.getSeconds();
-
-            // Asegurarse de que siempre haya dos dígitos para minutos y segundos
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            seconds = seconds < 10 ? '0' + seconds : seconds;
-
-            var timeString = hours + ':' + minutes + ':' + seconds;
-
-            // Actualiza el contenido de la etiqueta con id="clock"
-            document.getElementById('clock').innerText = timeString;
-        }
-
-        // Actualiza el reloj cada segundo
-        setInterval(updateClock, 1000);
-
-        // Ejecuta la función una vez al cargar la página
-        window.onload = updateClock;
-    </script> {% endcomment %}
-
     <script>
-        // Fecha y hora del curso en formato UTC
-        const fechaInicio = new Date("{{ course.start_date_time|date:'c' }}");  // formato ISO 8601
+        const fechaInicio = new Date("{{ course.start_date_time|date:'c' }}");
 
         function actualizarCuentaRegresiva() {
             const ahora = new Date();
             const diferencia = fechaInicio - ahora;
-
-            console.log("Diferencia",diferencia)
-
             const countdownEl = document.getElementById('countdown');
             const totalSegundos = Math.floor(diferencia / 1000);
             const dias = Math.floor(totalSegundos / 86400);
 
-            if (diferencia <= 0 && dias>=-1 ) {
+            if (diferencia <= 0 && dias >= -1) {
                 countdownEl.innerHTML = "¡El curso ha comenzado!";
                 clearInterval(interval);
                 return;
-            }else if(dias<=-1){
+            } else if (dias <= -1) {
                 clearInterval(interval);
                 return;
             }
-            
-            const horas = Math.floor((totalSegundos % 86400) / 3600);
 
+            const horas = Math.floor((totalSegundos % 86400) / 3600);
             if (dias >= 1) {
                 countdownEl.innerHTML = `Faltan ${dias} día(s)`;
-            } else if (horas>=1){
-                
+            } else if (horas >= 1) {
                 countdownEl.innerHTML = `Faltan ${horas.toString().padStart(2, '0')} horas`;
-                
-
-            }else{
-
+            } else {
                 const minutos = Math.floor((totalSegundos % 3600) / 60);
                 const segundos = totalSegundos % 60;
-                countdownEl.innerHTML = `EL curso comienza en ${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-
+                countdownEl.innerHTML = `El curso comienza en ${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
             }
         }
 
         const interval = setInterval(actualizarCuentaRegresiva, 1000);
-        actualizarCuentaRegresiva();  // Llamada inicial
+        actualizarCuentaRegresiva();
     </script>
-
-
 </head>
+
 <body>
     <h1>Reloj en tiempo real</h1>
-    <p id="clock"></p> 
+    <p id="clock"></p>
     <div id="countdown"></div>
+
     <h1>Vista curso</h1>
-
-        <div class="course-container">
-            {% comment %} {% for course in courses %}
-                <div class="course-card">
-                    <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
-                    <div class="course-content">
-                        <h3 class="course-title">{{ course.name }}</h3>
-                        <p class="course-description">{{ course.start_date }}</p>
-                        <a href="" class="course-button">Más información</a>
-                    </div>
-                </div>
-            {% endfor %} {% endcomment %}
-            <div class="course-card">
-                <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
-               
-            </div>
-
-            <div class="curso-info">
-                <h2>Curso de Programación</h2>
-                
-                <div class="chips-container">
-                    <span  class="badge bg-primary">Nivel: {{ course.level }}</span>
-                    <span class="badge bg-info">Duración: {{ course.start_date }}</span>
-                    <span class="badge bg-success">Descripción: {{ course.description }} </span>
-                    <br>
-                    <br>
-                    <span class="badge bg-success">Estatus: {{ exits }} </span>
-                    <span class="badge bg-success">Fecha de inicio: {{ course.start_date_time }} </span>
-                </div>
-            </div>
-            
-
+    <div class="course-container">
+        <div class="course-card">
+            <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
         </div>
 
+        <div class="curso-info">
+            <h2>{{ course.name }}</h2>
+            <div class="chips-container">
+                <span class="badge bg-primary">Nivel: {{ course.level }}</span>
+                <span class="badge bg-info">Inicio: {{ course.start_date }}</span>
+                <span class="badge bg-success">Descripción: {{ course.description }}</span>
+                <br><br>
+                <span class="badge bg-success">Estatus: {{ exits }}</span>
+                <span class="badge bg-success">Fecha de inicio: {{ course.start_date_time }}</span>
+            </div>
+        </div>
+    </div>
 
+    <h1>Contenido</h1>
+    {% if course.pdf_file %}
+        <a href="{{ course.pdf_file.url }}" target="_blank" class="btn-temario">Descargar Temario</a>
+    {% else %}
+        <p>No hay PDF disponible para este curso.</p>
+    {% endif %}
 
-        <h1>Contenido</h1>
-
-        {% if course.pdf_file %}
-            
-            <a href="{{ course.pdf_file.url }}" target="_blank" class="btn-temario" >
-                Descargar Temario
+    {% if user.is_authenticated %}
+        {% if exits == "Postulado" %}
+            <div>
+                Ya estás pregistrado, concluye tu registro 
+                <a href="{% url 'preinscription_course' slug=course.slug %}">
+                    <button>Confirmar pago</button>
+                </a>
+            </div>
+        {% elif not exits %}
+            <a href="{% url 'preinscription_course' slug=course.slug %}">
+                <button>Inscribirme al curso</button>
             </a>
-            
-        {% else %}
-            <p>No hay PDF disponible para este curso.</p>
         {% endif %}
+    {% else %}
+        <a href="{% url 'custom_login' course.id %}">
+            <button>Inscribirme al curso</button>
+        </a>
+    {% endif %}
+</body>
 
-        
-        {% if user.is_authenticated %}
-            {% if exits %}
-                <div>
-                    Ya estas pregistrado, concluye tu registro  <a href="{% url 'preinscription_course' slug=course.slug %}">aquí</a>
-                </div>
-            {% else %}
-                <a href="{% url 'preinscription_course'  slug=course.slug %}">
-                    <button>Inscribirme al curso</button>
-                </a>
-            {% endif %}
-        {% else %}
-                <a href="{% url 'custom_login' course.id %}">
-                    <button>Inscribirme al curso</button>
-                </a>
-        
-        {% endif %}
-
-            
-
-
-    </body>
-
-
-    <script>
-        window.addEventListener("pageshow", function(event) {
-            if (event.persisted) {  // Si la página fue cargada desde la caché del navegador
-                window.location.reload();  // Recargar la página
-            }
-        });
-      </script>
-      
-
+<script>
+    window.addEventListener("pageshow", function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
+</script>
 
 {% endblock %}
-

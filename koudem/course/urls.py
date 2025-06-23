@@ -11,6 +11,8 @@ urlpatterns = [
     path('payment_method/<int:user_id>/<int:course_id>/', views.payment_method, name='payment_method'),
     path('preinscription_course/<slug:slug>/', views.preinscription_course, name='preinscription_course'),
     path('inscription_user/<int:user_id>/<int:course_id>/<int:option>/', views.inscription_user, name='inscription_user'),
+    path('confirmar_pago/<slug:slug>/', views.confirmar_pago, name='confirmar_pago'),
+
 ]
 
 

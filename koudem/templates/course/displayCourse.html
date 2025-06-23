@@ -10,39 +10,121 @@
     <title>Course List</title>
 </head>
 <body>
+    <!-- Formulario de filtrado para Todos los cursos -->
+    <div class="filters-container">
+        <h2>Filtrar todos los cursos</h2>
+        <form method="get" action="." class="filter-form">
+            <div class="filter-group">
+                <label for="search">Buscar:</label>
+                <input type="text" name="search" id="search" value="{{ request.GET.search }}" placeholder="Nombre o descripción">
+            </div>
+            
+            <div class="filter-group">
+                <label for="category">Categoría:</label>
+                <select name="category" id="category">
+                    <option value="">Todas</option>
+                    {% for category in categories %}
+                        <option value="{{ category }}" {% if request.GET.category == category %}selected{% endif %}>
+                            {{ category }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="level">Nivel:</label>
+                <select name="level" id="level">
+                    <option value="">Todos</option>
+                    {% for level in levels %}
+                        <option value="{{ level }}" {% if request.GET.level == level %}selected{% endif %}>
+                            {{ level }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" name="filter_all" class="filter-button">Filtrar</button>
+            <a href="?" class="clear-filters">Limpiar todos los filtros</a>
+        </form>
+    </div>
 
-        <h1>Todos los cursos</h1>
+    <h1>Todos los cursos</h1>
+    {% if courses %}
         <div class="course-container">
             {% for course in courses %}
                 <div class="course-card">
-                    <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
+                    <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
                     <div class="course-content">
                         <h3 class="course-title">{{ course.name }}</h3>
                         <p class="course-description">{{ course.start_date }}</p>
-                        <a href="{% url "courses_view" course.slug %} " class="course-button">Más información</a>
+                        <p class="course-meta">Categoría: {{ course.category }} | Nivel: {{ course.level }}</p>
+                        <a href="{% url 'courses_view' course.slug %}" class="course-button">Más información</a>
                     </div>
                 </div>
             {% endfor %}
         </div>
+    {% else %}
+        <p class="no-results">No se encontraron cursos con los filtros seleccionados.</p>
+    {% endif %}
 
-        <h1>Mis cursos</h1>
+    <!-- Formulario de filtrado para Mis Cursos -->
+    <div class="filters-container" style="margin-top: 30px;">
+        <h2>Filtrar mis cursos</h2>
+        <form method="get" action="." class="filter-form">
+            <div class="filter-group">
+                <label for="my_search">Buscar:</label>
+                <input type="text" name="my_search" id="my_search" value="{{ request.GET.my_search }}" placeholder="Nombre o descripción">
+            </div>
+            
+            <div class="filter-group">
+                <label for="my_category">Categoría:</label>
+                <select name="my_category" id="my_category">
+                    <option value="">Todas</option>
+                    {% for category in user_categories %}
+                        <option value="{{ category }}" {% if request.GET.my_category == category %}selected{% endif %}>
+                            {{ category }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="filter-group">
+                <label for="my_level">Nivel:</label>
+                <select name="my_level" id="my_level">
+                    <option value="">Todos</option>
+                    {% for level in user_levels %}
+                        <option value="{{ level }}" {% if request.GET.my_level == level %}selected{% endif %}>
+                            {{ level }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit" name="filter_my" class="filter-button">Filtrar</button>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'my_search' and key != 'my_category' and key != 'my_level' %}{{ key }}={{ value }}&{% endif %}{% endfor %}" class="clear-filters">Limpiar mis filtros</a>
+        </form>
+    </div>
+
+    <h1>Mis cursos</h1>
+    {% if courses_user %}
         <div class="course-container">
             {% for course in courses_user %}
                 <div class="course-card">
-                    <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
+                    <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
                     <div class="course-content">
                         <h3 class="course-title">{{ course.name }}</h3>
                         <p class="course-description">{{ course.start_date }}</p>
-                        <a href="{% url "courses_view" course.slug %} " class="course-button">Más información</a>
+                        <p class="course-meta">Categoría: {{ course.category }} | Nivel: {{ course.level }}</p>
+                        <a href="{% url 'courses_view' course.slug %}" class="course-button">Más información</a>
                     </div>
                 </div>
-
-                
             {% endfor %}
         </div>
-
-</html>
+    {% else %}
+        <p class="no-results">No estás inscrito en ningún curso{% if request.GET.my_search or request.GET.my_category or request.GET.my_level %} con los filtros seleccionados{% endif %}.</p>
+    {% endif %}
 
 </body>
+</html>
 
 {% endblock %}

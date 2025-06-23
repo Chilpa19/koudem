@@ -25,6 +25,8 @@ class Course(models.Model):
     description = models.CharField(max_length=300,null=False,blank=False,default="description")
     slug = models.SlugField(unique=True, blank=True)
     start_date_time = models.DateTimeField(blank=False,default=timezone.make_aware(datetime.datetime.now()))
+    limit=models.IntegerField(blank=False,null=False,default=15)
+    availability=models.IntegerField(blank=False, null=False, default=15)
     days=ArrayField(models.CharField(
         max_length=3,
         choices=DAY_CHOICES
@@ -51,6 +53,8 @@ class Inscription(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     date_inscription = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=50,null=False,blank=False, default="Postulado")
+    progress = models.FloatField(default=0.0)  # Para almacenar el progreso del estudiante.
+    grade = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     # Puedes añadir otros campos relevantes, como la calificación, estado de la inscripción, etc.
     
     class Meta:
