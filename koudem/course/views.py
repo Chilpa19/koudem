@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from .form import *
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -7,23 +7,6 @@ from django.contrib.auth import logout,login,get_user_model
 from datetime import datetime
 from django.db.models import Q
 
-def create(request):
-    
-    if request.method=='GET':
-        print("Get curso create")
-        form=CreateCourseForm()
-        context={"form":form}
-        return render(request,"./course/createCourse.html",context)
-    else:
-        form = CreateCourseForm(request.POST, request.FILES)
-        print(form)
-        print("Curso ?")
-        if form.is_valid():
-            print("is valid")
-            form.save()
-            return redirect('courses_list')
-        
-        return HttpResponse("Curso NO Saved :c")
 
 
 @login_required(login_url='/user/login/')    
@@ -75,6 +58,24 @@ def courses_list(request):
     # Obtener categorías y niveles específicos de "Mis Cursos" para los filtros
     user_categories = list(set([course.category for course in cursos_user]))
     user_levels = list(set([course.level for course in cursos_user]))
+
+    now = timezone.now()
+
+    # Cursos futuros -> "Open"
+    Course.objects.filter(
+        start_date_time__gt=now
+    ).update(status="Open")
+
+    # Cursos que están ocurriendo -> "In progress"
+    Course.objects.filter(
+        start_date_time__lte=now,
+        end_date_time__gt=now
+    ).update(status="In progress")
+
+    # Cursos terminados -> "Close"
+    Course.objects.filter(
+        end_date_time__lte=now
+    ).update(status="Close")
     
     context = {
         "courses": courses,
@@ -93,6 +94,26 @@ def courses_list(request):
     return response
 
 
+@login_required(login_url='/user/login/')    
+def create(request):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("No tienes permisos para crear cursos.")
+    
+    if request.method=='GET':
+        print("Get curso create")
+        form=CreateCourseForm()
+        context={"form":form}
+        return render(request,"./course/createCourse.html",context)
+    else:
+        form = CreateCourseForm(request.POST, request.FILES)
+        print(form)
+        print("Curso ?")
+        if form.is_valid():
+            print("is valid")
+            form.save()
+            return redirect('courses_list')
+        
+        return HttpResponse("Curso NO Saved :c")
 
    
 def courses_view(request, slug):

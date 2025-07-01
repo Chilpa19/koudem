@@ -6,7 +6,7 @@ class CreateCourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ["name","category","level","cost","status",
-                  "start_date","start_date_time","end_date","image", 
+                  "start_date_time","end_date_time","image", 
                   "limit", "availability","days"
                 ]
         widgets = {

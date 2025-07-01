@@ -190,3 +190,10 @@ TIME_ZONE = 'America/Mexico_City'  # Ejemplo para Ciudad de México
 
 # Activar soporte para husos horarios
 USE_TZ = True  # True habilita el soporte de husos horarios
+
+
+# Tiempo de vida de la sesión en segundos (ej. 30 minutos = 1800 segundos)
+SESSION_COOKIE_AGE = 10800  
+
+# Renovar la sesión con cada request (opcional)
+SESSION_SAVE_EVERY_REQUEST = True

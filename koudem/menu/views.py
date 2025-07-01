@@ -11,21 +11,37 @@ from django.utils import timezone
 
 
 def portal(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+    else:
+        username = ''
 
-    if request.method=='POST':
-        username=request.POST['username']
+    # now = timezone.now()
+
+    # # Cursos futuros -> "Open"
+    # Course.objects.filter(
+    #     start_date_time__gt=now
+    # ).update(status="Open")
+
+    # # Cursos que están ocurriendo -> "In progress"
+    # Course.objects.filter(
+    #     start_date_time__lte=now,
+    #     end_date_time__gt=now
+    # ).update(status="In progress")
+
+    # # Cursos terminados -> "Close"
+    # Course.objects.filter(
+    #     end_date_time__lte=now
+    # ).update(status="Close")
 
     courses = Course.objects.all()
 
-    Course.objects.filter(
-        status="Open",
-        start_date_time__lte=timezone.now()
-    ).update(status="In progress")
-
-    context={"username":" ",
-             "courses": courses}
+    context = {
+        "username": username,
+        "courses": courses
+    }
     
-    return render(request,'menu/portal.html',context)
+    return render(request, 'menu/portal.html', context)
 
 
 def mision(request):

@@ -52,15 +52,17 @@
     {% if courses %}
         <div class="course-container">
             {% for course in courses %}
-                <div class="course-card">
-                    <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
-                    <div class="course-content">
-                        <h3 class="course-title">{{ course.name }}</h3>
-                        <p class="course-description">{{ course.start_date }}</p>
-                        <p class="course-meta">Categoría: {{ course.category }} | Nivel: {{ course.level }}</p>
-                        <a href="{% url 'courses_view' course.slug %}" class="course-button">Más información</a>
+                {% if course.status != "Close" %}
+                    <div class="course-card">
+                        <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
+                        <div class="course-content">
+                            <h3 class="course-title">{{ course.name }}</h3>
+                            <p class="course-description">{{ course.start_date }}</p>
+                            <p class="course-meta">Categoría: {{ course.category }} | Nivel: {{ course.level }}</p>
+                            <a href="{% url 'courses_view' course.slug %}" class="course-button">Más información</a>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             {% endfor %}
         </div>
     {% else %}
@@ -113,7 +115,7 @@
                     <img src="{{ course.image.url }}" alt="{{ course.name }}" class="course-image">
                     <div class="course-content">
                         <h3 class="course-title">{{ course.name }}</h3>
-                        <p class="course-description">{{ course.start_date }}</p>
+                        <span class="badge bg-primary">Estatus: {{ course.status }}</span> <br>
                         <p class="course-meta">Categoría: {{ course.category }} | Nivel: {{ course.level }}</p>
                         <a href="{% url 'courses_view' course.slug %}" class="course-button">Más información</a>
                     </div>
