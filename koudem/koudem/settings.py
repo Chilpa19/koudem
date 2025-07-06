@@ -11,16 +11,21 @@ env = environ.Env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-print("SECRET_KEY:", env('SECRET_KEY'))
+# print("SECRET_KEY:", env('SECRET_KEY'))
 
 
-SECRET_KEY = env.str('SECRET_KEY')
+SECRET_KEY = env('SECRET_KEY')
 #SECRET_KEY = "django-insecure-o(w)kc$sq8$u&lhl!se*#lyflm2%&@s30z^)yl7h(^korh7lmu"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[
+    'koudem.com',
+    'www.koudem.com',
+    'localhost',
+    '127.0.0.1'
+])
 
 
 RECAPTCHA_PUBLIC_KEY = '6LepmP4pAAAAAO1NLx2VU1GTCQPT_gJwpWNWO8KS'

@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=D:\marti\Documents\PROJECT_KOUDEM\koudem_v
+set VIRTUAL_ENV=C:\Users\chilp\Documents\Koudem\koudem_project\koudem_v
 
 if not defined PROMPT set PROMPT=$P$G
 

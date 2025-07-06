@@ -18,6 +18,35 @@ from .tokens import account_activation_token
 
 from django.db.models.query_utils import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+import six
+import datetime
+from django.conf import settings
+
+class AccountActivationTokenGenerator(PasswordResetTokenGenerator):
+    def _make_hash_value(self, user, timestamp):
+        return (
+            six.text_type(user.pk) + six.text_type(timestamp) + 
+            six.text_type(user.is_active)
+        )
+    
+    def check_token(self, user, token, expiration_seconds=1800):  # Cambiado a segundos
+        try:
+            ts_b36, _ = token.split("-")
+            ts = int(ts_b36, 36)
+        except ValueError:
+            return False
+        
+        # Calcula la fecha de expiración (30 segundos por defecto)
+        expiry_date = datetime.datetime.fromtimestamp(ts) + datetime.timedelta(seconds=expiration_seconds)
+        
+        if datetime.datetime.now() > expiry_date:
+            return False
+        
+        return super().check_token(user, token)
+
+account_activation_token = AccountActivationTokenGenerator()
+
 
 def activate(request,uidb64, token):
     User = get_user_model()
@@ -34,8 +63,20 @@ def activate(request,uidb64, token):
         
         return redirect('custom_login')
     else:
-        messages.error(request,"Activation link was invalid")
+        try:
+            ts_b36, _ = token.split("-")
+            ts = int(ts_b36, 36)
+            expiry_date = datetime.datetime.fromtimestamp(ts) + datetime.timedelta(seconds=30)
+            if datetime.datetime.now() > expiry_date:
+                messages.error(request, "El enlace de activación ha expirado (válido solo por 30 segundos).")
+            else:
+                messages.error(request, "El enlace de activación no es válido.")
+        except:
+            messages.error(request, "El enlace de activación no es válido.")
+    
     return redirect('portal')
+
+
 
 def activateEmail(request,user,to_email):
     mail_subject = "Activate your user"
