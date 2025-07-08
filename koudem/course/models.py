@@ -26,8 +26,8 @@ class Course(models.Model):
     pdf_file = models.FileField(upload_to='pdfs/', null=True, blank=True)
     description = models.CharField(max_length=300,null=False,blank=False,default="description")
     slug = models.SlugField(unique=True, blank=True)
-    start_date_time = models.DateTimeField(blank=False,default=timezone.make_aware(datetime.datetime.now()))
-    end_date_time = models.DateTimeField(blank=False,default=timezone.make_aware(datetime.datetime.now()))
+    start_date_time = models.DateTimeField(blank=False, default=timezone.now)
+    end_date_time = models.DateTimeField(blank=False, default=timezone.now)
     limit=models.IntegerField(blank=False,null=False,default=15)
     availability=models.IntegerField(blank=False, null=False, default=15)
     days=ArrayField(models.CharField(
