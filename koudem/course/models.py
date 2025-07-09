@@ -23,7 +23,6 @@ class Course(models.Model):
     cost =models.CharField(max_length=10,default="0.0",null=False,blank=False)
     status = models.CharField(max_length=50,null=False)
     image = models.ImageField(upload_to='images/',default="",null=True)
-    pdf_file = models.FileField(upload_to='pdfs/', null=True, blank=True)
     description = models.CharField(max_length=300,null=False,blank=False,default="description")
     slug = models.SlugField(unique=True, blank=True)
     start_date_time = models.DateTimeField(blank=False, default=timezone.now)
@@ -34,7 +33,7 @@ class Course(models.Model):
         max_length=3,
         choices=DAY_CHOICES
     ),verbose_name="Días",blank=True,default=list)
-
+    pdf_file = models.FileField(upload_to='pdfs/', null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:
