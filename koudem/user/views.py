@@ -152,8 +152,8 @@ def custom_login(request,course_id=None):
             #         print("Error de CAPTCHA")
             #         messages.error(request,"Selecciona Captcha")
             #         continue
-                print("key",key,"ERRER",error)
-                messages.error(request,error)
+                # print("key",key,"ERRER",error)
+                # messages.error(request,error)
         
             
     else:
