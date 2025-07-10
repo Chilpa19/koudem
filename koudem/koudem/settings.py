@@ -181,11 +181,11 @@ RECAPTCHA_USE_SSL = True  # opcional
 RECAPTCHA_PUBLIC_KEY = '6LepmP4pAAAAAO1NLx2VU1GTCQPT_gJwpWNWO8KS'
 RECAPTCHA_PRIVATE_KEY = '6LepmP4pAAAAAGcvVDT5YBYsnc9US6MoWucNj6Az'
 
-SILENCED_SYSTEM_CHECKS=['django_recaptcha.recaptcha_test_key_error']
+#SILENCED_SYSTEM_CHECKS=['django_recaptcha.recaptcha_test_key_error']
 
 RECAPTCHA_DOMAIN = 'www.recaptcha.net'
 
-RECAPTCHA_PROXY = {'http' : 'http://127.0.0.1:8000'}
+#RECAPTCHA_PROXY = {'http' : 'http://127.0.0.1:8000'}
 
 
 #Email Setting
