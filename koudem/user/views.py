@@ -147,11 +147,11 @@ def custom_login(request,course_id=None):
             print("mo valid")
             print(len(list(form.errors)))
             print(form.errors)
-            for key,error in list(form.errors.items()):
-                if key=='captcha' and error[0]=="This field is required.":
-                    print("Error de CAPTCHA")
-                    messages.error(request,"Selecciona Captcha")
-                    continue
+            # for key,error in list(form.errors.items()):
+            #     if key=='captcha' and error[0]=="This field is required.":
+            #         print("Error de CAPTCHA")
+            #         messages.error(request,"Selecciona Captcha")
+            #         continue
                 print("key",key,"ERRER",error)
                 messages.error(request,error)
         
