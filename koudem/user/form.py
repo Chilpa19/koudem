@@ -77,11 +77,11 @@ class PasswordResetForm(PasswordResetForm):
     def __init__(self, *args,**kwards):
         super(PasswordResetForm,self).__init__(*args,**kwards)
 
-    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
-            'data-theme': 'dark',
-            'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
-        })
-    )
+    # captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
+    #         'data-theme': 'dark',
+    #         'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
+    #     })
+    # )
 
 
 
