@@ -1,0 +1,48 @@
+{% extends "include/base_menu.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
+
+<head>
+    <title>Car</title>
+    <!-- CSRF token en meta -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+
+<body>
+    <h1>Vista Carrito</h1>
+            <div class="course-container" style="background-color: #d1d7e9">
+                <h2> Felicidades has agragado {{ course.name }} a tu carrito</h2>
+            </div>
+
+    
+        
+        <div class="course-container" style="background-color: #d1d7e9">
+            <div class="curso-info">
+                <h2>{{ course.name }}</h2>
+                <div class="chips-container">
+                    <span class="badge bg-primary">Nivel: {{ course.level }}</span>
+                    <span class="badge bg-success">Descripción: {{ course.description }}</span>
+                    <span class="badge bg-success">Estatus: {{ exits }}</span>
+                    <br><br>
+                    <span class="badge bg-success">Fecha de inicio: {{ course.start_date_time }}</span>
+                    <span class="badge bg-success">Fecha de finalización: {{ course.end_date_time }}</span>
+                </div>
+            </div>
+        </div>
+
+
+
+    <button class="btn btn-success">Pagar</button>
+
+
+    <a href="{% url 'car_shop' %}">
+        <button class="btn btn-success">Ir al carrito</button>
+    </a>
+
+
+
+
+{% endblock %}

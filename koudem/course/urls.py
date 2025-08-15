@@ -12,6 +12,10 @@ urlpatterns = [
     path('preinscription_course/<slug:slug>/', views.preinscription_course, name='preinscription_course'),
     path('inscription_user/<int:user_id>/<int:course_id>/<int:option>/', views.inscription_user, name='inscription_user'),
     path('confirmar_pago/<slug:slug>/', views.confirmar_pago, name='confirmar_pago'),
+    path('add_car_course/<slug:slug>/', views.add_car_course, name='add_car_course'),
+    path('add_car_shop/<slug:slug>/', views.add_car_shop, name='add_car_shop'),
+    path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('car_shop/', views.car_shop, name='car_shop'),
 
 ]
 

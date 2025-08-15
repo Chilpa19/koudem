@@ -8,41 +8,74 @@ from django.contrib.auth.forms import UserCreationForm,AuthenticationForm,SetPas
 from django_recaptcha.fields import ReCaptchaField 
 from django_recaptcha.widgets import ReCaptchaV2Checkbox
 
-from . import models
+from .models import CustomUser
 
-class UserForm(ModelForm):
-    class Meta:
-        model=models.User
-        fields=["username"]
 
 
 class UserRegistrationForm(UserCreationForm):
-    #email = forms.EmailField(help_text="A valid email :))", required=True)
-    username = forms.EmailField(label="Email pero es username",help_text="Helped")
-    first_name = forms.CharField(required=True, max_length=30, label="First Name")
-    last_name = forms.CharField(required=True, max_length=30, label="Last Name")
+    username = forms.EmailField(
+        label="Correo electrónico",
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'tuemail@ejemplo.com'})
+    )
+
+    first_name = forms.CharField(
+        label="Nombre",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    second_name = forms.CharField(
+        label="Segundo nombre",
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    father_name = forms.CharField(
+        label="Apellido Paterno",
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    mother_name = forms.CharField(
+        label="Apellido Materno",
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+
+    password1 = forms.CharField(
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+    password2 = forms.CharField(
+        label="Confirmar contraseña",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )
+
+
+
 
     class Meta:
-        model = get_user_model()
-        fields = ['first_name','last_name','username','password1','password2']
+        model = CustomUser
+        fields = ('username', 'first_name', 'second_name', 'father_name', 'mother_name', 'password1', 'password2')
 
     def save(self, commit=True):
-        user =super(UserRegistrationForm,self).save(commit=False)
+        user = super().save(commit=False)
         #user.email = self.cleaned_data['email']
+        user.second_name = self.cleaned_data.get('second_name')
+        user.father_name = self.cleaned_data.get('father_name')
+        user.mother_name = self.cleaned_data.get('mother_name')
 
         if commit:
             user.save()
-        return user    
+        return user   
     
 
 class EmailAuthenticationForm(forms.Form):
     email = forms.EmailField(label='Email', max_length=255,required=True)
     password = forms.CharField(label= 'Password',widget=PasswordInput)
-    # captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
-    #         'data-theme': 'dark',
-    #         'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
-    #     })
-    # )
+    captcha = ReCaptchaField(widget=ReCaptchaV2Checkbox(attrs={
+            'data-theme': 'dark',
+            'data-size' : 'compact'  # Ejemplo de atributo adicional para reCAPTCHA
+        })
+    )
 
     def __init__(self, *args,**kwards):
         self.user_cache = None

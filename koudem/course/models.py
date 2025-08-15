@@ -1,6 +1,10 @@
 from django.db import models
+from django.conf import settings
 from datetime import date
-from django.contrib.auth.models import User
+from payments.models import OrderDetail
+
+
+
 from django.utils.text import slugify
 from django.utils import timezone
 import datetime
@@ -51,13 +55,15 @@ class Course(models.Model):
         return self.name
     
 class Inscription(models.Model):
-    alumno = models.ForeignKey(User, on_delete=models.CASCADE)
+    alumno = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    order_detail=models.ForeignKey(OrderDetail,  on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+
     date_inscription = models.DateTimeField(null=True, blank=True)
     status = models.CharField(max_length=50,null=False,blank=False, default="Postulado")
     progress = models.FloatField(default=0.0)  # Para almacenar el progreso del estudiante.
     grade = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    # Puedes añadir otros campos relevantes, como la calificación, estado de la inscripción, etc.
     
     class Meta:
         unique_together = ('alumno', 'course')  # Para asegurar que no haya inscripciones duplicadas

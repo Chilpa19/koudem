@@ -12,9 +12,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 # print("SECRET_KEY:", env('SECRET_KEY'))
 
-
-SECRET_KEY = env('SECRET_KEY')
-#SECRET_KEY = "django-insecure-o(w)kc$sq8$u&lhl!se*#lyflm2%&@s30z^)yl7h(^korh7lmu"
+#SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = "django-insecure-o(w)kc$sq8$u&lhl!se*#lyflm2%&@s30z^)yl7h(^korh7lmu"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
@@ -55,6 +54,7 @@ INSTALLED_APPS = [
     'course',
     'menu',
     'core',
+    'payments',
     'django_recaptcha'
 ]
 
@@ -112,7 +112,7 @@ else:
             'USER': 'postgres',
             'PASSWORD': 'gordo1968',
             'HOST': 'localhost',
-            'PORT': '5433',
+            'PORT': '5432',
         }
     }
 
@@ -142,6 +142,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+AUTH_USER_MODEL = 'user.CustomUser'
 
 
 STATIC_URL = '/static/'

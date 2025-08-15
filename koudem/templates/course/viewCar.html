@@ -1,0 +1,61 @@
+{% extends "include/base_menu.html" %}
+{% load static %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
+
+<head>
+    <title>Car</title>
+    <!-- CSRF token en meta -->
+    <meta name="csrf-token" content="{{ csrf_token }}">
+</head>
+
+<body>
+    <h1>Vista Carrito</h1>
+
+    {% for in_car_user in in_car_users %}
+        <!-- ID único para poder eliminarlo con JS -->
+        <div id="item-{{ in_car_user.id }}" class="course-container" style="background-color: #d1d7e9">
+            <div class="curso-info">
+                <h2>{{ in_car_user.course.name }}</h2>
+                <div class="chips-container">
+                    <span class="badge bg-primary">Nivel: {{ in_car_user.course.level }}</span>
+                    <span class="badge bg-success">Descripción: {{ in_car_user.course.description }}</span>
+                    <span class="badge bg-success">Estatus: {{ exits }}</span>
+                    <br><br>
+                    <span class="badge bg-success">Fecha de inicio: {{ in_car_user.course.start_date_time }}</span>
+                    <span class="badge bg-success">Fecha de finalización: {{ in_car_user.course.end_date_time }}</span>
+                </div>
+            </div>
+            <button onclick="removeItem({{ in_car_user.id }})" class="btn btn-danger">Eliminar</button>
+        </div>
+    {% endfor %}
+
+<script>
+function getCsrfToken() {
+    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+}
+
+function removeItem(itemId) {
+    const csrftoken = getCsrfToken();
+    fetch(`/course/cart/remove/${itemId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Quitar el elemento del DOM inmediatamente
+            document.getElementById(`item-${itemId}`).remove();
+        } else {
+            alert("No se pudo eliminar el curso");
+        }
+    })
+    .catch(err => console.error("Error:", err));
+}
+</script>
+
+{% endblock %}

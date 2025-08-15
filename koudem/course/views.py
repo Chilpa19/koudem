@@ -1,10 +1,16 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from .form import *
+#from .form import *
+
+from django.http import JsonResponse
+from course.models import Inscription,Course
+from payments.models import CarItem
+
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout,login,get_user_model
-from datetime import datetime
+from django.utils import timezone
+
 from django.db.models import Q
 
 
@@ -14,6 +20,8 @@ def courses_list(request):
     # Obtener todos los cursos con posibles filtros
     courses = Course.objects.all()
     
+    
+
     # Obtener parámetros de filtrado del GET request para todos los cursos
     category_filter = request.GET.get('category')
     level_filter = request.GET.get('level')
@@ -117,16 +125,15 @@ def create(request):
 
    
 def courses_view(request, slug):
-    print("===========View course==========")
     user=request.user
     statusInscri=""
     course = get_object_or_404(Course, slug=slug)
 
-    # if course.status == "Open" and course.start_date <= date.today():
-    #     course.status = "In progress"
-    #     course.save()
+    in_car=CarItem.objects.filter(user=user,course=course).exists()
+
     course_id = course.id
     print("Course_id",course_id)
+
 
     # Obtener el curso con el ID dado
     if request.user.is_authenticated:
@@ -139,6 +146,7 @@ def courses_view(request, slug):
             statusInscri=None
     # Pasar el curso al contexto
     context = {
+        'in_car': in_car,
         'course': course,
         "exits" : statusInscri
     }
@@ -184,7 +192,7 @@ def preinscription_course(request, slug):
     print("Preinscription")
 
     course = get_object_or_404(Course, slug=slug)
-    alumno = request.user  # ✅ Usa el usuario autenticado correctamente
+    alumno = request.user  
 
     # Buscar si ya existe inscripción
     inscription = Inscription.objects.filter(course=course, alumno=alumno).first()
@@ -204,6 +212,52 @@ def preinscription_course(request, slug):
         'user': alumno
     }
     return render(request, "./course/preinscriptionCourse.html", context)
+
+
+def add_car_course(request, slug):
+    user=request.user
+    course = get_object_or_404(Course, slug=slug)
+
+
+    context = {
+        'course': course,
+        'user': user
+    }
+    return render(request, "./course/viewCar.html", context)
+
+@login_required
+def add_car_shop(request,slug):
+    user=request.user
+    course = get_object_or_404(Course, slug=slug)
+
+    in_car=CarItem.objects.filter(user=user,course=course).exists()
+
+    in_car_user=CarItem.objects.filter(user=user)
+
+    if not in_car:
+        addition=CarItem.objects.create(
+            course=course,
+            user=user
+        )
+    
+    context = {
+        'in_car_users':in_car_user,
+        'course':course,
+        'user': user
+    }
+    return render(request, "./course/viewAddCar.html", context)
+
+@login_required
+def remove_from_cart(request, item_id):
+    print("Eliminando")
+    if request.method == "POST":
+        item = get_object_or_404(CarItem, id=item_id, user=request.user)
+        print("Eliminando")
+        item.delete()
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False}, status=400)
+    
+    
 
 
 
@@ -236,6 +290,22 @@ def payment_course(user_id, course_id):
     
     # Guarda los cambios
     inscripcion.save()
+
+def car_shop(request):
+    user=request.user
+
+    car_items= CarItem.objects.filter(user=user)
+
+    # total_price=[i.course.cost for i in car_items]
+    # print(total_price)
+
+    total_price=sum(float(i.course.cost) for i in car_items)
+
+    contexto={
+        "in_car_users":car_items,
+        "total_price":total_price
+    }
+    return render(request, "./course/viewCarShop.html",contexto)
 
 
 

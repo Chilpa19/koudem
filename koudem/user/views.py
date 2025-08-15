@@ -82,7 +82,7 @@ def register(request):
                 messages.error(request,error)
     else:
         form = UserRegistrationForm()
-    return render(request=request, template_name="./registration/registration.html",context={"form":form})
+    return render(request, "users/registration.html",context={"form":form})
 
 
 def custom_login(request,course_id=None):
@@ -97,6 +97,7 @@ def custom_login(request,course_id=None):
             user = form.get_user()
             print(user,"user")
             if user is not None and course_id==None:
+                
                 print("Authenticated")
                 login(request,user)
                 return redirect('portal')

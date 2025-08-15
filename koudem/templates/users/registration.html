@@ -1,0 +1,30 @@
+{% extends "include/base_auth.html" %}
+
+<!DOCTYPE html>
+
+  
+    <title>Formulario de Contacto</title>
+
+{% block content %}
+    <h1>Formulario de </h1>
+    
+    {% include 'include/messaging.html' %}
+
+
+    <form  method="post">
+
+        {% csrf_token %}
+
+        <fieldset class="form-group">
+            {{ form.as_p }}
+        </fieldset>
+
+
+        <div>
+            <button type="submit">Sign up</button>
+        </div>
+
+        Already have an account? <li><a href="{% url "custom_login" %}">Login</a></li>
+
+    </form>
+{% endblock %}

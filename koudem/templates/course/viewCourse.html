@@ -93,6 +93,22 @@
             <button>Inscribirme al curso</button>
         </a>
     {% endif %}
+
+
+        {% if in_car %}
+            <a href="{% url 'car_shop' %}">
+                <button class="btn btn-success">Ir al carrito</button>
+            </a>
+        {% else %}
+
+            
+            <a href="{% url 'add_car_shop' slug=course.slug %}">
+                <button>Añadir al carrito NEW</button>
+            </a>
+        {% endif %}
+
+
+
 </body>
 
 <script>

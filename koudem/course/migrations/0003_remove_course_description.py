@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('course', '0002_remove_course_prueba'),
+         ('course', '0001_initial'), 
     ]
 
     operations = [
