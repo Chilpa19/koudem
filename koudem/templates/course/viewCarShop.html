@@ -1,65 +1,355 @@
-{% extends "include/base_menu.html" %}
-{% load static %}
-
-{% block content %}
-
-<link rel="stylesheet" href="{% static 'styles/courses/style.css' %}">
-
+<!DOCTYPE html>
+<html lang="es">
 <head>
-    <title>Car</title>
-    <!-- CSRF token en meta -->
-    <meta name="csrf-token" content="{{ csrf_token }}">
-</head>
-
-<body>
-    <h1>Vista Carrito</h1>
-
-    {% for in_car_user in in_car_users %}
-        <!-- ID único para poder eliminarlo con JS -->
-        <div id="item-{{ in_car_user.id }}" class="course-container" style="background-color: #d1d7e9">
-            <div class="curso-info">
-                <h2>{{ in_car_user.course.name }}</h2>
-                <div class="chips-container">
-                    <span class="badge bg-primary">Nivel: {{ in_car_user.course.level }}</span>
-                    <span class="badge bg-success">Descripción: {{ in_car_user.course.description }}</span>
-                    <span class="badge bg-success">Estatus: {{ exits }}</span>
-                    <br><br>
-                    <span class="badge bg-success">Fecha de inicio: {{ in_car_user.course.start_date_time }}</span>
-                    <span class="badge bg-success">Fecha de finalización: {{ in_car_user.course.end_date_time }}</span>
-                </div>
-            </div>
-            <h1>{{ in_car_user.course.cost }}</h1>
-            <button onclick="removeItem({{ in_car_user.id }})" class="btn btn-danger">Eliminar</button>
-        </div>
-    {% endfor %}
-    <h1>{{ total_price }}</h1>
-
-    <button class="btn btn-success">Pagar</button>
-
-<script>
-function getCsrfToken() {
-    return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-}
-
-function removeItem(itemId) {
-    const csrftoken = getCsrfToken();
-    fetch(`/course/cart/remove/${itemId}/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrftoken,
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Quitar el elemento del DOM inmediatamente
-            document.getElementById(`item-${itemId}`).remove();
-        } else {
-            alert("No se pudo eliminar el curso");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compras</title>
+    <script src="https://js.stripe.com/v3/"></script>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-    })
-    .catch(err => console.error("Error:", err));
-}
-</script>
+        
+        .course-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .course-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .course-info {
+            flex: 1;
+        }
+        
+        .course-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: #333;
+        }
+        
+        .course-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+        
+        .checkout-button {
+            background: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        
+        .checkout-button:hover {
+            background: #0052a3;
+        }
+        
+        .checkout-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .checkout-container {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .success {
+            background: #efe;
+            color: #363;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .confirm-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .confirm-button:hover {
+            background: #218838;
+        }
+        
+        .confirm-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .total-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            text-align: right;
+            margin: 20px 0;
+            padding: 20px;
+            border-top: 2px solid #0066cc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Carrito de Compras</h1>
+        
+        {% if in_car_users %}
+            {% for car_item in in_car_users %}
+            <div class="course-card">
+                {% if car_item.course.image %}
+                    <img src="{{ car_item.course.image.url }}" alt="{{ car_item.course.name }}" class="course-image">
+                {% endif %}
+                
+                <div class="course-info">
+                    <h3 class="course-name">{{ car_item.course.name }}</h3>
+                    <div class="course-price">${{ car_item.course.cost }}</div>
+                </div>
+                
+                <button class="checkout-button" 
+                        data-course-slug="{{ car_item.course.slug }}"
+                        data-course-id="{{ car_item.id }}">
+                    Proceder al Pago
+                </button>
+            </div>
+            
+            <!-- Contenedor para el checkout embedded -->
+            <div class="checkout-container" id="checkout-container-{{ car_item.id }}">
+                <div class="loading" id="loading-{{ car_item.id }}">
+                    Cargando checkout seguro...
+                </div>
+                <div id="payment-element-{{ car_item.id }}" style="display: none;"></div>
+                <div id="messages-{{ car_item.id }}"></div>
+            </div>
+            {% endfor %}
+            
+            <div class="total-price">
+                Total: ${{ total_price }}
+            </div>
+        {% else %}
+            <div class="error">
+                Tu carrito está vacío. <a href="/">Ir a cursos</a>
+            </div>
+        {% endif %}
+    </div>
 
-{% endblock %}
+    <script>
+        // Configurar Stripe
+        const stripePublicKey = '{{ STRIPE_PUBLISHABLE_KEY }}';
+        
+        if (!stripePublicKey || stripePublicKey === '') {
+            console.error('Error: STRIPE_PUBLISHABLE_KEY no configurada');
+            alert('Error de configuración: Clave de Stripe no encontrada');
+        }
+        
+        const stripe = Stripe(stripePublicKey);
+        let currentElements = null;
+
+        // Función para obtener CSRF token
+        function getCsrfToken() {
+            const cookieName = 'csrftoken';
+            const cookies = document.cookie.split(';');
+            
+            for (let cookie of cookies) {
+                const [name, value] = cookie.trim().split('=');
+                if (name === cookieName) {
+                    return decodeURIComponent(value);
+                }
+            }
+            return null;
+        }
+
+        // Función para mostrar mensajes
+        function showMessage(elementId, message, type = 'error') {
+            const messageDiv = document.getElementById(`messages-${elementId}`);
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        // Agregar event listeners a todos los botones
+        document.querySelectorAll('.checkout-button').forEach(button => {
+            button.addEventListener('click', async function() {
+                const courseSlug = this.dataset.courseSlug;
+                const courseId = this.dataset.courseId;
+                
+                // Ocultar otros checkouts
+                document.querySelectorAll('.checkout-container').forEach(container => {
+                    container.style.display = 'none';
+                });
+                
+                // Mostrar el checkout de este curso
+                const container = document.getElementById(`checkout-container-${courseId}`);
+                const loading = document.getElementById(`loading-${courseId}`);
+                const paymentElement = document.getElementById(`payment-element-${courseId}`);
+                
+                container.style.display = 'block';
+                loading.style.display = 'block';
+                paymentElement.style.display = 'none';
+                
+                // Deshabilitar botón
+                this.disabled = true;
+                this.textContent = 'Cargando...';
+
+                try {
+                    // Crear sesión de checkout
+                    const response = await fetch(`/payments/api/create-checkout-session/${courseSlug}/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken(),
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Error HTTP: ${response.status}`);
+                    }
+
+                    const { clientSecret, error } = await response.json();
+                    
+                    if (error) {
+                        throw new Error(error);
+                    }
+
+                    if (!clientSecret) {
+                        throw new Error('No se recibió client secret');
+                    }
+
+                    console.log('✅ Client secret recibido correctamente');
+
+                    // Crear elementos de Stripe
+                    currentElements = stripe.elements({ clientSecret });
+                    
+                    const paymentElementStripe = currentElements.create('payment', {
+                        layout: 'tabs'
+                    });
+
+                    // Montar el elemento
+                    paymentElementStripe.mount(`#payment-element-${courseId}`);
+
+                    // Cuando esté listo, mostrar el formulario
+                    paymentElementStripe.on('ready', () => {
+                        loading.style.display = 'none';
+                        paymentElement.style.display = 'block';
+                        
+                        // Crear botón de confirmación
+                        if (!document.getElementById(`confirm-button-${courseId}`)) {
+                            const confirmButton = document.createElement('button');
+                            confirmButton.id = `confirm-button-${courseId}`;
+                            confirmButton.className = 'confirm-button';
+                            confirmButton.textContent = 'Confirmar Pago';
+                            
+                            confirmButton.addEventListener('click', () => {
+                                handlePaymentSubmit(courseSlug, courseId);
+                            });
+                            
+                            paymentElement.appendChild(confirmButton);
+                        }
+                    });
+
+                    paymentElementStripe.on('change', (event) => {
+                        if (event.error) {
+                            showMessage(courseId, event.error.message);
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    showMessage(courseId, `Error: ${error.message}`);
+                    
+                    // Rehabilitar botón
+                    this.disabled = false;
+                    this.textContent = 'Proceder al Pago';
+                    
+                    // Ocultar loading
+                    loading.style.display = 'none';
+                }
+            });
+        });
+
+        // Función para procesar el pago
+        async function handlePaymentSubmit(courseSlug, courseId) {
+            if (!currentElements) {
+                showMessage(courseId, 'Error: Elementos no inicializados');
+                return;
+            }
+
+            const confirmButton = document.getElementById(`confirm-button-${courseId}`);
+            
+            // Deshabilitar botón
+            confirmButton.disabled = true;
+            confirmButton.textContent = 'Procesando...';
+
+            try {
+                const { error } = await stripe.confirmPayment({
+                    elements: currentElements,
+                    confirmParams: {
+                        return_url: `${window.location.origin}/checkout/return/${courseSlug}/`,
+                    },
+                });
+
+                if (error) {
+                    console.error('Payment error:', error);
+                    showMessage(courseId, error.message);
+                    
+                    // Rehabilitar botón
+                    confirmButton.disabled = false;
+                    confirmButton.textContent = 'Confirmar Pago';
+                } else {
+                    // El pago se procesó correctamente, Stripe redirigirá automáticamente
+                    showMessage(courseId, 'Procesando pago...', 'success');
+                }
+            } catch (error) {
+                console.error('Unexpected error:', error);
+                showMessage(courseId, 'Error inesperado al procesar el pago');
+                
+                // Rehabilitar botón
+                confirmButton.disabled = false;
+                confirmButton.textContent = 'Confirmar Pago';
+            }
+        }
+    </script>
+</body>
+</html>

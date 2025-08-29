@@ -6,13 +6,6 @@
 {% block content %}
     {% include 'include/messaging.html' %}
 
-    <h1 class="text-center">Login Custom2</h1>
-    <div class="d-grid gap-2 col-6 mx-auto">
-        <button class="btn btn-primary">Botón primario</button>
-        <button class="btn btn-secondary">Botón secundario</button>
-        <button class="btn btn-success">Botón de éxito</button>
-    </div>
-    
     <form method="post" class="mt-4">
         {% csrf_token %}
 

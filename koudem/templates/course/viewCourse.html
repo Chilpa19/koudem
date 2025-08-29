@@ -64,6 +64,7 @@
                 <br><br>
                 <span class="badge bg-success">Fecha de inicio: {{ course.start_date_time }}</span>
                 <span class="badge bg-success">Fecha de finalización: {{ course.end_date_time }}</span>
+                <span class="badge bg-success">sLUG: {{ course.slug }}</span>
             </div>
         </div>
     </div>
@@ -75,26 +76,6 @@
         <p>No hay PDF disponible para este curso.</p>
     {% endif %}
 
-    {% if user.is_authenticated %}
-        {% if exits == "Postulado" %}
-            <div>
-                Ya estás pregistrado, concluye tu registro 
-                <a href="{% url 'preinscription_course' slug=course.slug %}">
-                    <button>Confirmar pago</button>
-                </a>
-            </div>
-        {% elif not exits %}
-            <a href="{% url 'preinscription_course' slug=course.slug %}">
-                <button>Inscribirme al curso</button>
-            </a>
-        {% endif %}
-    {% else %}
-        <a href="{% url 'custom_login' course.id %}">
-            <button>Inscribirme al curso</button>
-        </a>
-    {% endif %}
-
-
         {% if in_car %}
             <a href="{% url 'car_shop' %}">
                 <button class="btn btn-success">Ir al carrito</button>
@@ -102,7 +83,7 @@
         {% else %}
 
             
-            <a href="{% url 'add_car_shop' slug=course.slug %}">
+            <a href="{% url 'add_car_shop' course_id=course.slug %}">
                 <button>Añadir al carrito NEW</button>
             </a>
         {% endif %}

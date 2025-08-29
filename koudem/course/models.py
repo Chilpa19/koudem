@@ -24,7 +24,7 @@ class Course(models.Model):
     name = models.CharField(max_length=50,null=False,blank=False)#
     category = models.CharField(max_length=50, null=False,blank=False)#
     level =models.CharField(max_length=50, null=False,blank=False)#
-    cost =models.CharField(max_length=10,default="0.0",null=False,blank=False)#
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=50,null=False)#
     image = models.ImageField(upload_to='images/',default="",null=True)#
     description = models.CharField(max_length=300,null=False,blank=False,default="description")

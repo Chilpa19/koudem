@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidde
 
 from django.http import JsonResponse
 from course.models import Inscription,Course
+from django.conf import settings
 from payments.models import CarItem
 
 from django.contrib.auth.models import User
@@ -11,7 +12,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout,login,get_user_model
 from django.utils import timezone
 
-from django.db.models import Q
+from django.db.models import Q,Sum
+
+import datetime
 
 
 
@@ -201,7 +204,7 @@ def preinscription_course(request, slug):
         inscription = Inscription.objects.create(
             course=course,
             alumno=alumno,
-            date_inscription=datetime.now()
+            date_inscription=datetime.datetime.now()
         )
         print("Inscripción creada")
     else:
@@ -243,21 +246,26 @@ def add_car_shop(request,slug):
     context = {
         'in_car_users':in_car_user,
         'course':course,
-        'user': user
+        'user': user,
+        'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY,
     }
+    print("CONTEXT",context)
     return render(request, "./course/viewAddCar.html", context)
 
 @login_required
 def remove_from_cart(request, item_id):
-    print("Eliminando")
     if request.method == "POST":
         item = get_object_or_404(CarItem, id=item_id, user=request.user)
-        print("Eliminando")
         item.delete()
-        return JsonResponse({"success": True})
+
+        # Recalcular total
+        total_price = CarItem.objects.filter(user=request.user).aggregate(
+            total=Sum("course__cost")
+        )["total"] or 0
+
+        return JsonResponse({"success": True, "total_price": total_price})
+
     return JsonResponse({"success": False}, status=400)
-    
-    
 
 
 
@@ -303,7 +311,8 @@ def car_shop(request):
 
     contexto={
         "in_car_users":car_items,
-        "total_price":total_price
+        "total_price":total_price,
+        'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY,
     }
     return render(request, "./course/viewCarShop.html",contexto)
 

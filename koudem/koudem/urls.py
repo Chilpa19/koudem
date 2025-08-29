@@ -30,6 +30,7 @@ urlpatterns = [
     path('index/', include("index.urls")),
     path('menu/', include("menu.urls")),
     path('course/', include("course.urls")),
+    path('payments/', include("payments.urls")),
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 

@@ -7,16 +7,30 @@ import dj_database_url
 
 env = environ.Env()
 
+#===============STRIPE
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-# print("SECRET_KEY:", env('SECRET_KEY'))
+# Sube un nivel más para llegar a /
+ROOT_DIR = BASE_DIR.parent
+environ.Env.read_env(os.path.join(ROOT_DIR, '.env'))
 
 #SECRET_KEY = env('SECRET_KEY')
-SECRET_KEY = "django-insecure-o(w)kc$sq8$u&lhl!se*#lyflm2%&@s30z^)yl7h(^korh7lmu"
+SECRET_KEY = env("SECRET_KEY")
+#django-insecure-o(w)kc$sq8$u&lhl!se*#lyflm2%&@s30z^)yl7h(^korh7lmu
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=True)
+
+
+
+STRIPE_SECRET_KEY = env('STRIPE_SECRET_KEY')
+STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY')
+
+print(f"DEBUG - Secret key: {STRIPE_SECRET_KEY[:20]}...")
+
+import stripe
+stripe.api_key = STRIPE_SECRET_KEY
+
 
 ALLOWED_HOSTS = [
     'koudem.com',
