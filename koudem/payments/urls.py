@@ -16,4 +16,11 @@ urlpatterns = [
     path('checkout/return/<slug:course_slug>/', 
          views.checkout_return, 
          name='checkout_return'),
+     
+     path("stripe/webhook/", views.stripe_webhook, name="stripe_webhook"),
+
+     path('api/check-enrollment/<int:course_id>/', views.check_enrollment, name='check_enrollment'),
+
+
+     
 ]

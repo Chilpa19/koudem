@@ -28,3 +28,13 @@ class CarItem(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     course=models.ForeignKey('course.Course', on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
+
+
+
+class WebhookEvent(models.Model):
+    stripe_id = models.CharField(max_length=255, unique=True)
+    payload = models.JSONField()  # guarda todo el evento
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Stripe Event {self.stripe_id}"

@@ -326,7 +326,7 @@
                 const { error } = await stripe.confirmPayment({
                     elements: currentElements,
                     confirmParams: {
-                        return_url: `${window.location.origin}/checkout/return/${courseSlug}/`,
+                        return_url: `http://127.0.0.1:8000/payments/checkout/return/${courseSlug}/`,
                     },
                 });
 

@@ -16,6 +16,7 @@ from django.db.models import Q,Sum
 
 import datetime
 
+from .form import CreateCourseForm
 
 
 @login_required(login_url='/user/login/')    
@@ -126,7 +127,7 @@ def create(request):
         
         return HttpResponse("Curso NO Saved :c")
 
-   
+@login_required(login_url='/user/login/')    
 def courses_view(request, slug):
     user=request.user
     statusInscri=""

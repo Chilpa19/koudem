@@ -1,0 +1,56 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Estado del pago - {{ course.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-lg text-center">
+        <h1 class="text-2xl font-bold mb-4">Pago del curso: {{ course.name }}</h1>
+
+        <!-- Mensajes dinámicos -->
+        <div id="payment-message" class="text-lg mb-4 text-gray-700">
+            Estamos procesando tu pago...
+        </div>
+
+        <a id="course-link" href="{% url 'courses_view' course.slug %}" 
+           class="hidden px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+           Ir al curso
+        </a>
+    </div>
+
+    <script>
+const interval = setInterval(() => {
+    checkEnrollment();
+}, 3000);
+
+function checkEnrollment() {
+    $.ajax({
+        url: '/payments/api/check-enrollment/{{ course.id }}/',
+        method: 'GET',
+        success: function(data) {
+            if (data.enrolled) {
+                $('#payment-message').text('🎉 ¡Pago exitoso! Ya estás inscrito en el curso.');
+                $('#course-link').removeClass('hidden');
+
+                // ✅ Detener el bucle
+                clearInterval(interval);
+            } else {
+                $('#payment-message').text('⏳ Estamos verificando tu pago...');
+            }
+        },
+        error: function() {
+            $('#payment-message').text('⚠️ No se pudo verificar tu inscripción. Intenta refrescando la página.');
+        }
+    });
+}
+
+    </script>
+
+</body>
+</html>
