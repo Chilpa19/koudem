@@ -133,26 +133,30 @@ def courses_view(request, slug):
     statusInscri=""
     course = get_object_or_404(Course, slug=slug)
 
+    try:
+        inscription=Inscription.objects.get(alumno=user, course=course)
+    except Inscription.DoesNotExist:
+        inscription=""
+
+    #print("Inscripcion", inscription.status)
+
     in_car=CarItem.objects.filter(user=user,course=course).exists()
 
     course_id = course.id
     print("Course_id",course_id)
 
-
-    # Obtener el curso con el ID dado
-    if request.user.is_authenticated:
-        
+    if request.user.is_authenticated: 
         inscription_exists = Inscription.objects.filter(alumno=user, course=course_id)
-
         try:
             statusInscri=inscription_exists[0].status
         except IndexError:
             statusInscri=None
-    # Pasar el curso al contexto
+   
     context = {
         'in_car': in_car,
         'course': course,
-        "exits" : statusInscri
+        "exits" : statusInscri,
+        "inscription": inscription
     }
 
     response = render(request, "./course/viewCourse.html", context)
@@ -189,7 +193,6 @@ def inscription_user(request, user_id, course_id, option):
         return HttpResponseRedirect(url_whatsapp)
 
     
-    # Redirigir a alguna página después de la inscripción
     
 @login_required
 def preinscription_course(request, slug):

@@ -14,6 +14,15 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
     
+    @staticmethod
+    def calculateTotal(order,courses_ids):
+
+        orderItems=OrderDetail.objects.filter(order=order,course_id__in=courses_ids)
+
+        return sum(orderItem.price_unitary for orderItem in orderItems)
+    
+
+    
 
 class OrderDetail(models.Model):
     order= models.ForeignKey(Order, on_delete=models.CASCADE)

@@ -8,18 +8,18 @@ urlpatterns = [
     path('cart/', views.car_shop, name='car_shop'),
     
     # API para crear sesión de checkout
-    path('api/create-checkout-session/<slug:course_slug>/', 
+    path('api/create-checkout-session/', 
          views.create_checkout_session, 
          name='create_checkout_session'),
     
     # Página de retorno después del pago
-    path('checkout/return/<slug:course_slug>/', 
+    path('checkout/return/', 
          views.checkout_return, 
          name='checkout_return'),
      
      path("stripe/webhook/", views.stripe_webhook, name="stripe_webhook"),
 
-     path('api/check-enrollment/<int:course_id>/', views.check_enrollment, name='check_enrollment'),
+     path('api/check-enrollment/', views.check_enrollment, name='check_enrollment'),
 
 
      

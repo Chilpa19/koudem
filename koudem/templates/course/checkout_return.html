@@ -4,53 +4,94 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Estado del pago - {{ course.name }}</title>
+    <title>Estado del pago</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
     <div class="bg-white shadow-md rounded-lg p-8 max-w-lg text-center">
-        <h1 class="text-2xl font-bold mb-4">Pago del curso: {{ course.name }}</h1>
+        <h1 class="text-2xl font-bold mb-4">Estado del pago de tus cursos</h1>
 
         <!-- Mensajes dinámicos -->
         <div id="payment-message" class="text-lg mb-4 text-gray-700">
             Estamos procesando tu pago...
         </div>
 
-        <a id="course-link" href="{% url 'courses_view' course.slug %}" 
-           class="hidden px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-           Ir al curso
+        {% comment %} <a id="course-link" href="{% url 'courses' %}" 
+           class="hidden px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"> {% endcomment %}
+        <a id="course-link" href="#" class="hidden px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
+           Ver mis cursos
         </a>
+        <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
     </div>
 
-    <script>
-const interval = setInterval(() => {
-    checkEnrollment();
-}, 3000);
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const courseIds = {{ course_ids_json|safe }};
+    const csrfToken = getCookie('csrftoken');
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectStatus = urlParams.get('redirect_status');
 
-function checkEnrollment() {
-    $.ajax({
-        url: '/payments/api/check-enrollment/{{ course.id }}/',
-        method: 'GET',
-        success: function(data) {
-            if (data.enrolled) {
-                $('#payment-message').text('🎉 ¡Pago exitoso! Ya estás inscrito en el curso.');
-                $('#course-link').removeClass('hidden');
+    let attempts = 0;
+    const maxAttempts = 10; // ⏳ se detendrá después de 20 intentos (≈ 1 min)
 
-                // ✅ Detener el bucle
-                clearInterval(interval);
-            } else {
-                $('#payment-message').text('⏳ Estamos verificando tu pago...');
+    const interval = setInterval(checkEnrollments, 3000);
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.startsWith(name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
-        },
-        error: function() {
-            $('#payment-message').text('⚠️ No se pudo verificar tu inscripción. Intenta refrescando la página.');
         }
-    });
-}
+        return cookieValue;
+    }
 
-    </script>
+    function checkEnrollments() {
+        attempts++;
+
+        $.ajax({
+            url: '/payments/api/check-enrollment/',
+            method: 'POST',
+            contentType: 'application/json',
+            headers: { 'X-CSRFToken': csrfToken },
+            data: JSON.stringify({ course_ids: courseIds }),
+            success: function(data) {
+                const enrolled = data.enrolled_courses;
+                console.log("courseIds",courseIds, "enrolled", enrolled);
+
+                if (redirectStatus === 'succeeded') {
+                        console.log("Pago proceión...");
+                    }
+
+                if (enrolled.length === courseIds.length) {
+                    $('#payment-message').text(`🎉 ¡Pago exitoso! Ya estás inscrito en ${enrolled.length} cursos.`);
+                    $('#course-link').removeClass('hidden');
+                    clearInterval(interval);
+                } else {
+                    $('#payment-message').text(`⏳ Verificando tu pago... (${enrolled.length}/${courseIds.length} cursos inscritos)`);
+                }
+            },
+            error: function() {
+                $('#payment-message').text('⚠️ No se pudo verificar tu inscripción.');
+            },
+            complete: function() {
+                if (attempts >= maxAttempts) {
+                    clearInterval(interval);
+                    $('#payment-message').text('⌛ El tiempo de verificación ha expirado. Si tu pago fue exitoso, actualiza la página.');
+                }
+            }
+        });
+    }
+});
+</script>
+
 
 </body>
 </html>

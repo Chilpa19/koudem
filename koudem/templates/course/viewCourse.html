@@ -28,8 +28,10 @@
             }
 
             const horas = Math.floor((totalSegundos % 86400) / 3600);
-            if (dias >= 1) {
+            if (dias > 1) {
                 countdownEl.innerHTML = `Faltan ${dias} día(s)`;
+            }else if (dias==1){
+                countdownEl.innerHTML = `Faltan ${dias} día`;
             } else if (horas >= 1) {
                 countdownEl.innerHTML = `Faltan ${horas.toString().padStart(2, '0')} horas`;
             } else {
@@ -76,17 +78,24 @@
         <p>No hay PDF disponible para este curso.</p>
     {% endif %}
 
+    {% if inscription.status != "Paid" %}
+
         {% if in_car %}
+
             <a href="{% url 'car_shop' %}">
                 <button class="btn btn-success">Ir al carrito</button>
             </a>
-        {% else %}
 
+        {% else %}
             
             <a href="{% url 'add_car_shop' course.slug %}">
                 <button>Añadir al carrito NEW</button>
             </a>
+
         {% endif %}
+    {% endif %}
+
+    <p>inscription.status = {{ inscription.status }}</p>
 
 
 

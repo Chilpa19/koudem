@@ -19,6 +19,8 @@ from django.contrib.auth.models import User
 from payments.models import CarItem,Order,OrderDetail, WebhookEvent
 from user.models import CustomUser
 
+from django.views.decorators.http import require_POST
+
 
 
 # @login_required
@@ -81,7 +83,7 @@ WEBHOOK_SECRET="whsec_7a1dd39c365df49aa065fb289acdfe37f63a8f7b8bf7ea087fed9f20cb
 
 @login_required
 def car_shop(request):
-    """Vista principal del carrito de compras"""
+    print("Carrito de compras view")
     user = request.user
     car_items = CarItem.objects.filter(user=user)
     total_price = sum(float(i.course.cost) for i in car_items)
@@ -94,27 +96,45 @@ def car_shop(request):
     return render(request, "./course/viewCarShop.html", context)
 
 @csrf_exempt
-def create_checkout_session(request, course_slug):
-    if request.method == 'POST':
-        try:
-            course = get_object_or_404(Course, slug=course_slug)
+@login_required
+def create_checkout_session(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+    else:
+        print("Checkout")
+    
 
-            intent = stripe.PaymentIntent.create(
-                amount=int(course.cost * 100),
-                currency='usd',
-                automatic_payment_methods={'enabled': True},
-                metadata={
-                    'course_id': course.id,
-                    'course_slug': course.slug,
-                    'user_id': request.user.id if request.user.is_authenticated else '',
-                }
-            )
+    try:
+        print("Post check")
+        data = json.loads(request.body)
+        print("data",data)
+        course_ids = data.get("course_ids", [])
+        if not course_ids:
+            return JsonResponse({"error": "No se recibieron cursos"}, status=400)
 
-            return JsonResponse({'clientSecret': intent.client_secret})
+        # Obtener cursos
+        courses = Course.objects.filter(id__in=course_ids)
+        if not courses.exists():
+            return JsonResponse({"error": "Cursos no encontrados"}, status=404)
 
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=500)
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
+        # Calcular monto total
+        total_amount = int(sum(course.cost for course in courses) * 100)  # centavos
+
+        # Crear PaymentIntent
+        intent = stripe.PaymentIntent.create(
+            amount=total_amount,
+            currency="mxn",
+            automatic_payment_methods={"enabled": True},
+            metadata={
+                "course_ids": ",".join(str(c.id) for c in courses),
+                "user_id": request.user.id,
+            }
+        )
+
+        return JsonResponse({"clientSecret": intent.client_secret})
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 # def checkout_return(request, course_slug):
 #     """Página de retorno después del pago"""
@@ -185,86 +205,115 @@ def create_checkout_session(request, course_slug):
 #     return JsonResponse({"enrolled": enrolled})
 
 
-def checkout_return(request, course_slug):
-    """Página de retorno después del pago"""
-    course = get_object_or_404(Course, slug=course_slug)
+@login_required
+def checkout_return(request):
+    """Página de retorno después de pagar carrito completo"""
+    # Traemos los cursos del carrito del usuario
+    car_items = CarItem.objects.filter(user=request.user)
+
+    courses = [item.course for item in car_items]
+    course_ids = [item.course.id for item in car_items]  # <- IDs para JS
+
+    print(courses)
+
     context = {
-        'course': course,
-        'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY,
+        "course":courses,
+        "courses": courses,
+        "total_price": sum(item.course.cost for item in car_items),
+        "STRIPE_PUBLISHABLE_KEY": settings.STRIPE_PUBLISHABLE_KEY,
+        "course_ids_json": json.dumps(course_ids),  # <- Pasamos como JSON seguro
     }
+
+
+
     return render(request, "course/checkout_return.html", context)
 
 @csrf_exempt
 def stripe_webhook(request):
-    """Webhook para procesar PaymentIntent completado"""
-    print("Webhook")
     payload = request.body
     sig_header = request.META.get("HTTP_STRIPE_SIGNATURE")
-    
+
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, WEBHOOK_SECRET)
     except stripe.error.SignatureVerificationError:
         return HttpResponse(status=400)
-    
-    print("Event",event["type"])
-    if WebhookEvent.objects.filter(stripe_id=event["id"]).exists():
-        print(f"⚠️ Evento duplicado ignorado: {event['id']}")
-        return HttpResponse(status=200)
-
-    WebhookEvent.objects.create(
-        stripe_id=event["id"],
-        payload=event
-    )
-
 
     if event["type"] == "payment_intent.succeeded":
         intent = event["data"]["object"]
-        course_id = intent.metadata.get("course_id")
         user_id = intent.metadata.get("user_id")
-        print("USER_ID",user_id)
-
+        course_ids = intent.metadata.get("course_ids", "").split(",")
 
         try:
+            #print("USER_ID",user_id)
+            car_items = CarItem.objects.filter(user=user_id)
+            #print("CAR obtenido con exito")
+            user = CustomUser.objects.get(id=user_id)
+            #print("DATOS OBTENIDOS")
 
-            if event["type"] == "payment_intent.succeeded":
-                intent = event["data"]["object"]
-                course_id = intent.metadata.get("course_id")
-                user_id = intent.metadata.get("user_id")
-                print("USER_ID",user_id)
+            # Crear orden
+            orden = Order.objects.create(
+                user=user,
+                created_at=timezone.now(),
+                status="Paid"
+            )
+            print("ORDEN CREADA")
 
-                course = Course.objects.get(id=course_id)
-                user = CustomUser.objects.get(id=user_id) 
+            for cid in course_ids:
+                course = Course.objects.get(id=int(cid))
 
-                orden=Order.objects.create(
-                    user=user,
-                    created_at=timezone.now(),
-                    status='Paid'
-                )
-
-                orden_detail=OrderDetail.objects.create(
+                order_detail = OrderDetail.objects.create(
                     order=orden,
                     course=course,
-                    price_unitary=200
+                    price_unitary=course.cost
                 )
+
 
                 Inscription.objects.get_or_create(
-
-                    alumno=user,
-                    order_detail=orden_detail,
-                    course=course
+                        alumno=user,
+                        order_detail=order_detail,
+                        course=course,
+                        status= "Paid"
+                    )
                 
-                )
-                print(f"✅ Inscripción creada: {user.username} en {course.name}")
+            orden.total_price=Order.calculateTotal(orden,course_ids)
+            orden.save()
+            car_items.delete()
+
+            print(f"✅ Orden {orden.id} creada para {user.username} con {len(course_ids)} cursos")
+
+
         except Exception as e:
-            print(f"❌ Error creando inscripción: {e}")
+            print(f"❌ Error creando inscripción múltiple: {e}")
 
     return HttpResponse(status=200)
 
+
 @login_required
-def check_enrollment(request, course_id):
-    """Verifica si el usuario ya está inscrito en el curso"""
-    print("Enrooll")
-    user = request.user
-    enrolled = Inscription.objects.filter(alumno=user, course_id=course_id).exists()
-    #enrolled = True
-    return JsonResponse({"enrolled": enrolled})
+@csrf_exempt
+def check_enrollment(request):
+    """Verifica si el usuario está inscrito en todos o algunos de los cursos"""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            course_ids = data.get("course_ids", [])
+            
+            user = request.user
+
+            # Buscar cursos en los que el usuario ya está inscrito
+            enrolled_courses = Inscription.objects.filter(
+                alumno=user, course_id__in=course_ids
+            ).values_list("course_id", flat=True)
+
+            enrolled_courses_list = list(enrolled_courses)
+
+            print( "Enrooled courses",enrolled_courses_list)
+
+            return JsonResponse({
+                "enrolled_courses": enrolled_courses_list,
+                "all_enrolled": len(enrolled_courses_list) == len(course_ids)
+            })
+
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    return JsonResponse({"error": "Método no permitido"}, status=405)

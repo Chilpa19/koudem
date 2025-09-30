@@ -132,224 +132,136 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Carrito de Compras</h1>
-        
-        {% if in_car_users %}
-            {% for car_item in in_car_users %}
-            <div class="course-card">
-                {% if car_item.course.image %}
-                    <img src="{{ car_item.course.image.url }}" alt="{{ car_item.course.name }}" class="course-image">
-                {% endif %}
-                
-                <div class="course-info">
-                    <h3 class="course-name">{{ car_item.course.name }}</h3>
-                    <div class="course-price">${{ car_item.course.cost }}</div>
-                </div>
-                
-                <button class="checkout-button" 
-                        data-course-slug="{{ car_item.course.slug }}"
-                        data-course-id="{{ car_item.id }}">
-                    Proceder al Pago
-                </button>
-            </div>
-            
-            <!-- Contenedor para el checkout embedded -->
-            <div class="checkout-container" id="checkout-container-{{ car_item.id }}">
-                <div class="loading" id="loading-{{ car_item.id }}">
-                    Cargando checkout seguro...
-                </div>
-                <div id="payment-element-{{ car_item.id }}" style="display: none;"></div>
-                <div id="messages-{{ car_item.id }}"></div>
-            </div>
-            {% endfor %}
-            
-            <div class="total-price">
-                Total: ${{ total_price }}
-            </div>
-        {% else %}
-            <div class="error">
-                Tu carrito está vacío. <a href="/">Ir a cursos</a>
-            </div>
-        {% endif %}
-    </div>
+ <div class="container">
+    <h1>Carrito de Compras</h1>
 
-    <script>
-        // Configurar Stripe
-        const stripePublicKey = '{{ STRIPE_PUBLISHABLE_KEY }}';
-        
-        if (!stripePublicKey || stripePublicKey === '') {
-            console.error('Error: STRIPE_PUBLISHABLE_KEY no configurada');
-            alert('Error de configuración: Clave de Stripe no encontrada');
-        }
-        
-        const stripe = Stripe(stripePublicKey);
-        let currentElements = null;
+    {% if in_car_users %}
+        {% for car_item in in_car_users %}
+        <div class="course-card" data-course-id="{{ car_item.course.id }}">
+            {% if car_item.course.image %}
+                <img src="{{ car_item.course.image.url }}" alt="{{ car_item.course.name }}" class="course-image">
+            {% endif %}
 
-        // Función para obtener CSRF token
-        function getCsrfToken() {
-            const cookieName = 'csrftoken';
-            const cookies = document.cookie.split(';');
-            
-            for (let cookie of cookies) {
-                const [name, value] = cookie.trim().split('=');
-                if (name === cookieName) {
-                    return decodeURIComponent(value);
-                }
+            <div class="course-info">
+                <h3 class="course-name">{{ car_item.course.name }}</h3>
+                <div class="course-price">${{ car_item.course.cost }}</div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="total-price">
+            Total: ${{ total_price }}
+        </div>
+
+        <button id="pay-cart-button">Pagar Carrito</button>
+
+        <div id="checkout-container">
+            <div id="loading" style="display:none;">Cargando checkout seguro...</div>
+            <div id="payment-element"></div>
+            <div id="messages"></div>
+        </div>
+    {% else %}
+        <div class="error">
+            Tu carrito está vacío. <a href="/">Ir a cursos</a>
+        </div>
+    {% endif %}
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const stripePublicKey = '{{ STRIPE_PUBLISHABLE_KEY }}';
+    const stripe = Stripe(stripePublicKey);
+
+    // 👉 Junta todos los IDs de cursos del carrito
+    const buttons = document.querySelectorAll('.checkout-button');
+    const courseIds = Array.from(document.querySelectorAll('.course-card'))
+                       .map(div => parseInt(div.dataset.courseId))
+                       .filter(id => !isNaN(id));
+
+
+    console.log("Botones encontrados:", buttons.length);
+    console.log("IDs en carrito:", courseIds);
+
+    // Elementos del checkout
+    const container = document.getElementById("checkout-container");
+    const loading = document.getElementById("loading");
+    const paymentElementDiv = document.getElementById("payment-element");
+    let elements;
+
+    // CSRF para Django
+    function getCsrfToken() {
+        const cookieName = 'csrftoken';
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === cookieName) {
+                return decodeURIComponent(value);
             }
-            return null;
         }
+        return null;
+    }
 
-        // Función para mostrar mensajes
-        function showMessage(elementId, message, type = 'error') {
-            const messageDiv = document.getElementById(`messages-${elementId}`);
-            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
-            setTimeout(() => {
-                messageDiv.innerHTML = '';
-            }, 5000);
-        }
+    // 👉 Agregar event listener a un solo botón de "pagar carrito"
+    document.getElementById("pay-cart-button").addEventListener("click", async () => {
+        try {
+            console.log("IDs en carrito:", courseIds);
 
-        // Agregar event listeners a todos los botones
-        document.querySelectorAll('.checkout-button').forEach(button => {
-            button.addEventListener('click', async function() {
-                const courseSlug = this.dataset.courseSlug;
-                const courseId = this.dataset.courseId;
-                
-                // Ocultar otros checkouts
-                document.querySelectorAll('.checkout-container').forEach(container => {
-                    container.style.display = 'none';
-                });
-                
-                // Mostrar el checkout de este curso
-                const container = document.getElementById(`checkout-container-${courseId}`);
-                const loading = document.getElementById(`loading-${courseId}`);
-                const paymentElement = document.getElementById(`payment-element-${courseId}`);
-                
-                container.style.display = 'block';
-                loading.style.display = 'block';
-                paymentElement.style.display = 'none';
-                
-                // Deshabilitar botón
-                this.disabled = true;
-                this.textContent = 'Cargando...';
-
-                try {
-                    // Crear sesión de checkout
-                    const response = await fetch(`/payments/api/create-checkout-session/${courseSlug}/`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCsrfToken(),
-                        },
-                    });
-
-                    if (!response.ok) {
-                        throw new Error(`Error HTTP: ${response.status}`);
-                    }
-
-                    const { clientSecret, error } = await response.json();
-                    
-                    if (error) {
-                        throw new Error(error);
-                    }
-
-                    if (!clientSecret) {
-                        throw new Error('No se recibió client secret');
-                    }
-
-                    console.log('✅ Client secret recibido correctamente');
-
-                    // Crear elementos de Stripe
-                    currentElements = stripe.elements({ clientSecret });
-                    
-                    const paymentElementStripe = currentElements.create('payment', {
-                        layout: 'tabs'
-                    });
-
-                    // Montar el elemento
-                    paymentElementStripe.mount(`#payment-element-${courseId}`);
-
-                    // Cuando esté listo, mostrar el formulario
-                    paymentElementStripe.on('ready', () => {
-                        loading.style.display = 'none';
-                        paymentElement.style.display = 'block';
-                        
-                        // Crear botón de confirmación
-                        if (!document.getElementById(`confirm-button-${courseId}`)) {
-                            const confirmButton = document.createElement('button');
-                            confirmButton.id = `confirm-button-${courseId}`;
-                            confirmButton.className = 'confirm-button';
-                            confirmButton.textContent = 'Confirmar Pago';
-                            
-                            confirmButton.addEventListener('click', () => {
-                                handlePaymentSubmit(courseSlug, courseId);
-                            });
-                            
-                            paymentElement.appendChild(confirmButton);
-                        }
-                    });
-
-                    paymentElementStripe.on('change', (event) => {
-                        if (event.error) {
-                            showMessage(courseId, event.error.message);
-                        }
-                    });
-
-                } catch (error) {
-                    console.error('Error:', error);
-                    showMessage(courseId, `Error: ${error.message}`);
-                    
-                    // Rehabilitar botón
-                    this.disabled = false;
-                    this.textContent = 'Proceder al Pago';
-                    
-                    // Ocultar loading
-                    loading.style.display = 'none';
-                }
-            });
+            // Llamar a backend para crear PaymentIntent con TODOS los cursos
+        const response = await fetch("/payments/api/create-checkout-session/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": getCsrfToken(),
+            },
+            body: JSON.stringify({ course_ids: courseIds }) // <-- esto debe ser un array de números
         });
 
-        // Función para procesar el pago
-        async function handlePaymentSubmit(courseSlug, courseId) {
-            if (!currentElements) {
-                showMessage(courseId, 'Error: Elementos no inicializados');
+            const data = await response.json();
+
+            if (data.error) {
+                console.error("❌ Error en backend:", data.error);
                 return;
             }
 
-            const confirmButton = document.getElementById(`confirm-button-${courseId}`);
-            
-            // Deshabilitar botón
-            confirmButton.disabled = true;
-            confirmButton.textContent = 'Procesando...';
+            console.log("✅ Client secret recibido:", data.clientSecret);
 
-            try {
+            // Inicializar Stripe Elements
+            elements = stripe.elements({ clientSecret: data.clientSecret });
+            const paymentElement = elements.create("payment", { layout: "tabs" });
+            paymentElement.mount("#payment-element");
+
+            loading.style.display = "none";
+            paymentElementDiv.style.display = "block";
+
+            // Agregar botón de confirmar
+            const confirmButton = document.createElement("button");
+            confirmButton.textContent = "Confirmar Pago";
+            confirmButton.className = "confirm-button";
+            confirmButton.addEventListener("click", async () => {
                 const { error } = await stripe.confirmPayment({
-                    elements: currentElements,
+                    elements,
                     confirmParams: {
-                        return_url: `http://127.0.0.1:8000/payments/checkout/return/${courseSlug}/`,
+                        return_url: "http://127.0.0.1:8000/payments/checkout/return/",
                     },
                 });
 
                 if (error) {
-                    console.error('Payment error:', error);
-                    showMessage(courseId, error.message);
-                    
-                    // Rehabilitar botón
-                    confirmButton.disabled = false;
-                    confirmButton.textContent = 'Confirmar Pago';
+                    console.error("❌ Error de pago:", error.message);
                 } else {
-                    // El pago se procesó correctamente, Stripe redirigirá automáticamente
-                    showMessage(courseId, 'Procesando pago...', 'success');
+                    console.log("✅ Pago procesado, redirigiendo...");
                 }
-            } catch (error) {
-                console.error('Unexpected error:', error);
-                showMessage(courseId, 'Error inesperado al procesar el pago');
-                
-                // Rehabilitar botón
-                confirmButton.disabled = false;
-                confirmButton.textContent = 'Confirmar Pago';
-            }
+            });
+
+            container.appendChild(confirmButton);
+
+        } catch (err) {
+            console.error("❌ Error inesperado:", err);
         }
-    </script>
+    });
+});
+</script>
+
+
 </body>
 </html>
