@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
             // Inicializar Stripe Elements
             elements = stripe.elements({ clientSecret: data.clientSecret });
-            const paymentElement = elements.create("payment", { layout: "tabs" });
+            const paymentElement = elements.create("payment", { layout: "accordion"});
             paymentElement.mount("#payment-element");
 
             loading.style.display = "none";

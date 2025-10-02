@@ -29,6 +29,9 @@ class OrderDetail(models.Model):
     course=models.ForeignKey('course.Course', on_delete=models.CASCADE)
     price_unitary= models.DecimalField(max_digits=10,decimal_places=2,default=0.0)
 
+    
+
+
 
     def __str__(self):
         return f" Order detail {self.course.name} -${self.price_unitary}"
@@ -37,6 +40,9 @@ class CarItem(models.Model):
     user=models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.CASCADE)
     course=models.ForeignKey('course.Course', on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'course')
 
 
 
