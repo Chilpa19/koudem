@@ -8,8 +8,10 @@
 <head>
     <title>Course List</title>
 
+
+
     <script>
-        const fechaInicio = new Date("{{ course.start_date_time|date:'c' }}");
+        const fechaInicio = new Date("{{ course.start_date|date:'c' }}");
 
         function actualizarCuentaRegresiva() {
             const ahora = new Date();
@@ -52,7 +54,7 @@
     <div id="countdown"></div>
 
     <h1>Vista curso</h1>
-    <div class="course-container">
+    <div class="course-container" >
         <div class="course-card">
             <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
         </div>
@@ -64,9 +66,10 @@
                 <span class="badge bg-success">Descripción: {{ course.description }}</span>
                 <span class="badge bg-success">Estatus: {{ exits }}</span>
                 <br><br>
-                <span class="badge bg-success">Fecha de inicio: {{ course.start_date_time }}</span>
-                <span class="badge bg-success">Fecha de finalización: {{ course.end_date_time }}</span>
-                <span class="badge bg-success">sLUG: {{ course.slug }}</span>
+                <span class="badge bg-success">Fecha de inicio: {{ course.start_date }}</span>
+                <span class="badge bg-success">Fecha de finalización: {{ course.end_date }}</span>
+                <span class="badge bg-success">Slug: {{ course.slug }}</span>
+                <span class="badge bg-success">Dias: {{ course.days }}</span>
             </div>
         </div>
     </div>

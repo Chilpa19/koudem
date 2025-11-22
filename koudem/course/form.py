@@ -6,8 +6,8 @@ class CreateCourseForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ["name","category","level","cost","status",
-                  "start_date_time","end_date_time","image", 
-                  "limit", "availability","days"
+                  "start_date","end_date","image", 
+                  "limit", "availability","days","start_time","end_time"
                 ]
         widgets = {
             'days': forms.CheckboxSelectMultiple(

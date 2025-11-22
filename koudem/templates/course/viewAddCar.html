@@ -12,12 +12,19 @@
 </head>
 
 <body>
+    
     <h1>Vista Carrito</h1>
+
+    {% if flag_add %}
             <div class="course-container" style="background-color: #d1d7e9">
                 <h2> Felicidades has agragado {{ course.name }} a tu carrito</h2>
             </div>
+    {% else %}
+                <div class="course-container" style="background-color: #d1d7e9">
+                <h2> No puedes inscribirte a este curso {{ course.name }} a tu carrito</h2>
+            </div>
 
-    
+    {% endif %}
         
         <div class="course-container" style="background-color: #d1d7e9">
             <div class="curso-info">
@@ -27,8 +34,8 @@
                     <span class="badge bg-success">Descripción: {{ course.description }}</span>
                     <span class="badge bg-success">Estatus: {{ exits }}</span>
                     <br><br>
-                    <span class="badge bg-success">Fecha de inicio: {{ course.start_date_time }}</span>
-                    <span class="badge bg-success">Fecha de finalización: {{ course.end_date_time }}</span>
+                    <span class="badge bg-success">Fecha de inicio: {{ course.start_date }}</span>
+                    <span class="badge bg-success">Fecha de finalización: {{ course.end_date }}</span>
                 </div>
             </div>
         </div>

@@ -135,6 +135,9 @@
  <div class="container">
     <h1>Carrito de Compras</h1>
 
+    padding
+    
+
     {% if in_car_users %}
         {% for car_item in in_car_users %}
         <div class="course-card" data-course-id="{{ car_item.course.id }}">
@@ -145,6 +148,7 @@
             <div class="course-info">
                 <h3 class="course-name">{{ car_item.course.name }}</h3>
                 <div class="course-price">${{ car_item.course.cost }}</div>
+                    <button class="remove-button" data-item-id="{{ car_item.id }}">❌ Quitar</button>
             </div>
         </div>
         {% endfor %}
@@ -168,6 +172,7 @@
 </div>
 
 
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const stripePublicKey = '{{ STRIPE_PUBLISHABLE_KEY }}';
@@ -178,7 +183,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const courseIds = Array.from(document.querySelectorAll('.course-card'))
                        .map(div => parseInt(div.dataset.courseId))
                        .filter(id => !isNaN(id));
-
 
     console.log("Botones encontrados:", buttons.length);
     console.log("IDs en carrito:", courseIds);
@@ -208,14 +212,14 @@ document.addEventListener("DOMContentLoaded", function() {
             console.log("IDs en carrito:", courseIds);
 
             // Llamar a backend para crear PaymentIntent con TODOS los cursos
-        const response = await fetch("/payments/api/create-checkout-session/", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": getCsrfToken(),
-            },
-            body: JSON.stringify({ course_ids: courseIds }) // <-- esto debe ser un array de números
-        });
+            const response = await fetch("/payments/api/create-checkout-session/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCsrfToken(),
+                },
+                body: JSON.stringify({ course_ids: courseIds })
+            });
 
             const data = await response.json();
 
@@ -259,6 +263,50 @@ document.addEventListener("DOMContentLoaded", function() {
             console.error("❌ Error inesperado:", err);
         }
     });
+
+    // 🧹 Eliminar curso del carrito
+    document.querySelectorAll('.remove-button').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const itemId = event.target.dataset.itemId;
+            const csrfToken = getCsrfToken();
+
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/course/cart/remove/${itemId}/`, {
+                    method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": getCsrfToken(),
+                },
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Eliminar el elemento del DOM
+                    const card = event.target.closest('.course-card');
+                    card.remove();
+
+                    // Actualizar el total
+                    const totalDiv = document.querySelector('.total-price');
+                    totalDiv.textContent = `Total: $${data.total_price}`;
+
+                    // Si el carrito queda vacío, mostrar mensaje
+                    if (document.querySelectorAll('.course-card').length === 0) {
+                        document.querySelector('.container').innerHTML = `
+                            <div class="error">
+                                Tu carrito está vacío. <a href="/">Ir a cursos</a>
+                            </div>
+                        `;
+                    }
+                } else {
+                    console.error("❌ No se pudo eliminar el item");
+                }
+            } catch (err) {
+                console.error("❌ Error en la petición:", err);
+            }
+        });
+    });
+
 });
 </script>
 

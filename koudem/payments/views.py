@@ -23,51 +23,6 @@ from django.views.decorators.http import require_POST
 
 
 
-# @login_required
-# def CreateCheckoutSessionView(request, slug):
-#     print("Checkout, sin tema")
-  
-
-#     #product = Course.objects.get(id=course_id)
-#     course = get_object_or_404(Course, slug=slug)
-
-#     YOUR_DOMAIN = f"{request.scheme}://{request.get_host()}"
-
-
-#     # http or https
-#     # 127.0.0.1:8000
-#     # http://127.0.0.1:8000
-    
-#     checkout_session = stripe.checkout.Session.create(
-#         payment_method_types=['card'],
-#         line_items=[{
-#             'price_data': {
-#                 'currency': 'mxn',
-#                 'product_data': {
-#                     'name': course.name,
-#                     'images': ["https://test-koudem.s3.us-east-2.amazonaws.com/Chivas.png"],                    
-#                     'metadata': {
-#                         'course_id': course,
-#                     }
-#                 },
-#                 'unit_amount': int(course.cost*100),  
-#             },
-#             'quantity': 1,
-#         }],
-#         metadata = {
-#             'course_id': course,
-#             'user_email': request.user.email,
-#         },
-        
-#         mode='payment',
-
-#         success_url=YOUR_DOMAIN + f'/payment-success/{course}/',
-#         cancel_url=YOUR_DOMAIN + f'/pricing/{course}/',
-#     )
-
-#     return redirect(checkout_session.url)
-
-# views.py
 import stripe
 import json
 from django.conf import settings

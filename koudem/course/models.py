@@ -10,8 +10,6 @@ from django.utils import timezone
 import datetime
 from django.contrib.postgres.fields import ArrayField
 
-
-
 class Course(models.Model):
     DAY_CHOICES=[
         ('LUN','LUNES'),
@@ -29,10 +27,12 @@ class Course(models.Model):
     image = models.ImageField(upload_to='images/',default="",null=True)#
     description = models.CharField(max_length=300,null=False,blank=False,default="description")
     slug = models.SlugField(unique=True, blank=True)
-    start_date_time = models.DateTimeField(blank=False, default=timezone.now)#
-    end_date_time = models.DateTimeField(blank=False, default=timezone.now)#
+    start_date = models.DateField(blank=False, default=timezone.now)#
+    end_date = models.DateField(blank=False, default=timezone.now)#
     limit=models.IntegerField(blank=False,null=False,default=15)
     availability=models.IntegerField(blank=False, null=False, default=15)
+    start_time = models.TimeField(default="00:00")
+    end_time = models.TimeField(default="00:00")
     days=ArrayField(models.CharField(
         max_length=3,
         choices=DAY_CHOICES
@@ -53,6 +53,32 @@ class Course(models.Model):
 
     def __str__(self):
         return self.name
+
+    @staticmethod
+    def checkOverlapCourse(inscription, course):
+
+        new_course_start_date = course.start_date
+        new_course_end_date =  course.end_date
+        for insc in inscription:
+            
+            if(new_course_start_date<insc.course.end_date and insc.course.start_date<new_course_end_date):
+                print("Existe traslape de fecha calendario")
+                for day in insc.course.days:
+                    if day in course.days:
+                        print("Existe traslape de dia")
+                        if course.start_time<insc.course.end_time and insc.course.start_time<course.end_time:
+                            print("Existe coincidencia de hora")
+                            print("Traslapeeee")
+                            overlap = True
+                            break
+             else:
+                print("No hay traslape")
+                overlap = False
+            
+            return overlap
+            
+
+
     
 class Inscription(models.Model):
     alumno = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

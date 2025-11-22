@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 #from .form import *
-
+from django.contrib import messages
 from django.http import JsonResponse
 from course.models import Inscription,Course
 from django.conf import settings
@@ -23,6 +23,7 @@ from .form import CreateCourseForm
 def courses_list(request):
     # Obtener todos los cursos con posibles filtros
     courses = Course.objects.all()
+    print("All courses", courses)
     
     
 
@@ -73,21 +74,21 @@ def courses_list(request):
 
     now = timezone.now()
 
-    # Cursos futuros -> "Open"
-    Course.objects.filter(
-        start_date_time__gt=now
-    ).update(status="Open")
+    # # Cursos futuros -> "Open"
+    # Course.objects.filter(
+    #     start_date_time__gt=now
+    # ).update(status="Open")
 
-    # Cursos que están ocurriendo -> "In progress"
-    Course.objects.filter(
-        start_date_time__lte=now,
-        end_date_time__gt=now
-    ).update(status="In progress")
+    # # Cursos que están ocurriendo -> "In progress"
+    # Course.objects.filter(
+    #     start_date_time__lte=now,
+    #     end_date_time__gt=now
+    # ).update(status="In progress")
 
-    # Cursos terminados -> "Close"
-    Course.objects.filter(
-        end_date_time__lte=now
-    ).update(status="Close")
+    # # Cursos terminados -> "Close"
+    # Course.objects.filter(
+    #     end_date_time__lte=now
+    # ).update(status="Close")
     
     context = {
         "courses": courses,
@@ -236,19 +237,31 @@ def add_car_course(request, slug):
 def add_car_shop(request,slug):
     user=request.user
     course = get_object_or_404(Course, slug=slug)
+    in_car_user=""
+    overlap = Course.checkOverlapCourse(inscription, course)
+    if (overlap):
+        inscription = Inscription.objects.filter(alumno=user)
+        print("Inscripciones", inscription)
+        overlap = Course.checkOverlapCourse(inscription, course)
+        print("Overlap", overlap)
 
-    in_car=CarItem.objects.filter(user=user,course=course).exists()
+        messages.success(request, "Tristemente no puedes inscribirte")
+        flag_add=False
+    else:
+        in_car=CarItem.objects.filter(user=user,course=course).exists()
 
-    in_car_user=CarItem.objects.filter(user=user)
-
-    if not in_car:
-        addition=CarItem.objects.create(
+        in_car_user=CarItem.objects.filter(user=user)
+        if not in_car:
+            addition=CarItem.objects.create(
             course=course,
             user=user
         )
-    
+        flag_add=True
+        
+
     context = {
         'in_car_users':in_car_user,
+        'flag_add':flag_add,
         'course':course,
         'user': user,
         'STRIPE_PUBLISHABLE_KEY': settings.STRIPE_PUBLISHABLE_KEY,
@@ -258,6 +271,7 @@ def add_car_shop(request,slug):
 
 @login_required
 def remove_from_cart(request, item_id):
+    print("Eliminando")
     if request.method == "POST":
         item = get_object_or_404(CarItem, id=item_id, user=request.user)
         item.delete()

@@ -15,26 +15,20 @@ def portal(request):
         username = request.POST['username']
     else:
         username = ''
+    hoy = timezone.now().date()
 
-    # now = timezone.now()
+    Course.objects.filter(
+        start_date__lt=hoy,
+        status="In progress"
+        ).update(status="Close")
 
-    # # Cursos futuros -> "Open"
-    # Course.objects.filter(
-    #     start_date_time__gt=now
-    # ).update(status="Open")
+    courses = Course.objects.filter(start_date__gte=hoy)
 
-    # # Cursos que están ocurriendo -> "In progress"
-    # Course.objects.filter(
-    #     start_date_time__lte=now,
-    #     end_date_time__gt=now
-    # ).update(status="In progress")
+    # courses = Course.objects.all()
 
-    # # Cursos terminados -> "Close"
-    # Course.objects.filter(
-    #     end_date_time__lte=now
-    # ).update(status="Close")
+    print("Courses", courses)
 
-    courses = Course.objects.all()
+
 
     context = {
         "username": username,

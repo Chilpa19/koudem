@@ -23,7 +23,7 @@
 
     <div class="course-container">
         {% for course in courses %}
-            {% if course.status != "Close" %}
+            {% if course.status %}
                 <div class="course-card">
                     <img src="{{ course.image.url }}" alt="Curso 1" class="course-image">
                     <div class="course-content">
