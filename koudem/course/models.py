@@ -71,7 +71,7 @@ class Course(models.Model):
                             print("Traslapeeee")
                             overlap = True
                             break
-             else:
+            else:
                 print("No hay traslape")
                 overlap = False
             

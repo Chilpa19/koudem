@@ -9,6 +9,7 @@
     <title>Car</title>
     <!-- CSRF token en meta -->
     <meta name="csrf-token" content="{{ csrf_token }}">
+    <script src="{% static 'js/contador.js' %}"></script>
 </head>
 
 <body>
@@ -19,6 +20,25 @@
             <div class="course-container" style="background-color: #d1d7e9">
                 <h2> Felicidades has agragado {{ course.name }} a tu carrito</h2>
             </div>
+
+            <div class="course-container" style="background-color: #d1d7e9">
+                <div class="curso-info">
+                    <h2>{{ course.name }}</h2>
+                    <div class="chips-container">
+                        <span class="badge bg-primary">Nivel: {{ course.level }}</span>
+                        <span class="badge bg-success">Descripción: {{ course.description }}</span>
+                        <span class="badge bg-success">Estatus: {{ exits }}</span>
+                        <br><br>
+                        <span class="badge bg-success">Fecha de inicio: {{ course.start_date }}</span>
+                        <span class="badge bg-success">Fecha de finalización: {{ course.end_date }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{% url 'car_shop' %}">
+                <button class="btn btn-success">Pagar curso</button>
+            </a>
+
     {% else %}
                 <div class="course-container" style="background-color: #d1d7e9">
                 <h2> No puedes inscribirte a este curso {{ course.name }} a tu carrito</h2>
@@ -26,28 +46,9 @@
 
     {% endif %}
         
-        <div class="course-container" style="background-color: #d1d7e9">
-            <div class="curso-info">
-                <h2>{{ course.name }}</h2>
-                <div class="chips-container">
-                    <span class="badge bg-primary">Nivel: {{ course.level }}</span>
-                    <span class="badge bg-success">Descripción: {{ course.description }}</span>
-                    <span class="badge bg-success">Estatus: {{ exits }}</span>
-                    <br><br>
-                    <span class="badge bg-success">Fecha de inicio: {{ course.start_date }}</span>
-                    <span class="badge bg-success">Fecha de finalización: {{ course.end_date }}</span>
-                </div>
-            </div>
-        </div>
 
 
 
-    {% comment %} <button class="btn btn-success">Pagar</button> {% endcomment %}
-
-
-    <a href="{% url 'car_shop' %}">
-        <button class="btn btn-success">Pagar curso</button>
-    </a>
 
 
 

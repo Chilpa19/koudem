@@ -14,7 +14,7 @@ from django.utils import timezone
 
 from django.db.models import Q,Sum
 
-import datetime
+from datetime import datetime
 
 from .form import CreateCourseForm
 
@@ -148,6 +148,9 @@ def courses_view(request, slug):
 
     if request.user.is_authenticated: 
         inscription_exists = Inscription.objects.filter(alumno=user, course=course_id)
+        fecha_contador= str(course.start_date)+" "+str(course.start_time)
+        print(fecha_contador)
+        dt = datetime.strptime(fecha_contador, "%Y-%m-%d %H:%M:%S")
         try:
             statusInscri=inscription_exists[0].status
         except IndexError:
@@ -157,7 +160,8 @@ def courses_view(request, slug):
         'in_car': in_car,
         'course': course,
         "exits" : statusInscri,
-        "inscription": inscription
+        "inscription": inscription,
+        "fecha_contador" : dt
     }
 
     response = render(request, "./course/viewCourse.html", context)
@@ -238,14 +242,15 @@ def add_car_shop(request,slug):
     user=request.user
     course = get_object_or_404(Course, slug=slug)
     in_car_user=""
+    inscription = Inscription.objects.filter(alumno=user)
     overlap = Course.checkOverlapCourse(inscription, course)
     if (overlap):
-        inscription = Inscription.objects.filter(alumno=user)
+        
         print("Inscripciones", inscription)
         overlap = Course.checkOverlapCourse(inscription, course)
         print("Overlap", overlap)
 
-        messages.success(request, "Tristemente no puedes inscribirte")
+        messages.error(request, "Tristemente no puedes inscribirte")
         flag_add=False
     else:
         in_car=CarItem.objects.filter(user=user,course=course).exists()
