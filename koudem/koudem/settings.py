@@ -5,6 +5,8 @@ import os
 import environ
 import dj_database_url
 
+from datetime import timedelta
+
 env = environ.Env()
 
 #===============STRIPE
@@ -69,7 +71,8 @@ INSTALLED_APPS = [
     'menu',
     'core',
     'payments',
-    'django_recaptcha'
+    'django_recaptcha',
+    'app'
 ]
 
 MIDDLEWARE = [
@@ -233,3 +236,18 @@ SESSION_SAVE_EVERY_REQUEST = True
 print("RAILWAY_ENVIRONMENT:", os.getenv("RAILWAY_ENVIRONMENT"))
 print("DATABASE_URL:", os.getenv("DATABASE_URL"))
 print("DATABASE_PUBLIC_URL:", os.getenv("DATABASE_PUBLIC_URL"))
+
+
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
+
+
+CELERY_BEAT_SCHEDULE = {
+    'actualizar-inscripciones-cada-minuto': {
+        'task': 'app.tasks.actualizar_inscripciones_en_progreso',
+        'schedule': timedelta(minutes=1),
+    },
+}
+
+

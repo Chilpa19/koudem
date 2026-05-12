@@ -59,6 +59,7 @@ class Course(models.Model):
 
         new_course_start_date = course.start_date
         new_course_end_date =  course.end_date
+        overlap=False
         for insc in inscription:
             
             if(new_course_start_date<insc.course.end_date and insc.course.start_date<new_course_end_date):
@@ -71,6 +72,9 @@ class Course(models.Model):
                             print("Traslapeeee")
                             overlap = True
                             break
+                    else:
+                        overlap = False
+
             else:
                 print("No hay traslape")
                 overlap = False

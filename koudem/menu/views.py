@@ -17,14 +17,14 @@ def portal(request):
         username = ''
     hoy = timezone.now().date()
 
-    Course.objects.filter(
-        start_date__lt=hoy,
-        status="In progress"
-        ).update(status="Close")
+    # Course.objects.filter(
+    #     start_date__lt=hoy,
+    #     status="In progress"
+    #     ).update(status="Close")
 
     courses = Course.objects.filter(start_date__gte=hoy)
 
-    # courses = Course.objects.all()
+    #courses = Course.objects.all()
 
     print("Courses", courses)
 

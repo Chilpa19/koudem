@@ -22,57 +22,17 @@ from .form import CreateCourseForm
 @login_required(login_url='/user/login/')    
 def courses_list(request):
     # Obtener todos los cursos con posibles filtros
+    hoy = timezone.now().date()
+
     courses = Course.objects.all()
+    courses = Course.objects.filter(start_date__gte=hoy)
     print("All courses", courses)
     
-    
 
-    # Obtener parámetros de filtrado del GET request para todos los cursos
-    category_filter = request.GET.get('category')
-    level_filter = request.GET.get('level')
-    search_query = request.GET.get('search')
-    
-    # Aplicar filtros si existen para todos los cursos
-    if category_filter:
-        courses = courses.filter(category=category_filter)
-    if level_filter:
-        courses = courses.filter(level=level_filter)
-    if search_query:
-        courses = courses.filter(
-            Q(name__icontains=search_query) | 
-            Q(description__icontains=search_query)
-        )
-    
-    # Cursos enrolados con filtros independientes
     user = request.user
     inscriptions = Inscription.objects.filter(alumno=user)
     cursos_user = [i.course for i in inscriptions]
     
-    # Obtener parámetros de filtrado específicos para "Mis Cursos"
-    my_category_filter = request.GET.get('my_category')
-    my_level_filter = request.GET.get('my_level')
-    my_search_query = request.GET.get('my_search')
-    
-    # Aplicar filtros a "Mis Cursos" si existen
-    if my_category_filter:
-        cursos_user = [course for course in cursos_user if course.category == my_category_filter]
-    if my_level_filter:
-        cursos_user = [course for course in cursos_user if course.level == my_level_filter]
-    if my_search_query:
-        search_lower = my_search_query.lower()
-        cursos_user = [course for course in cursos_user 
-                      if search_lower in course.name.lower() or 
-                      search_lower in course.description.lower()]
-    
-    # Obtener opciones únicas para los selectores de filtro
-    all_categories = Course.objects.values_list('category', flat=True).distinct()
-    all_levels = Course.objects.values_list('level', flat=True).distinct()
-    
-    # Obtener categorías y niveles específicos de "Mis Cursos" para los filtros
-    user_categories = list(set([course.category for course in cursos_user]))
-    user_levels = list(set([course.level for course in cursos_user]))
-
-    now = timezone.now()
 
     # # Cursos futuros -> "Open"
     # Course.objects.filter(
@@ -93,10 +53,8 @@ def courses_list(request):
     context = {
         "courses": courses,
         "courses_user": cursos_user,
-        "categories": all_categories,
-        "levels": all_levels,
-        "user_categories": user_categories,
-        "user_levels": user_levels,
+
+
     }
     
     response = render(request, "./course/displayCourse.html", context)
@@ -250,7 +208,7 @@ def add_car_shop(request,slug):
         overlap = Course.checkOverlapCourse(inscription, course)
         print("Overlap", overlap)
 
-        messages.error(request, "Tristemente no puedes inscribirte")
+        messages.error(request, "Este curso se traslapa con otro ya inscrito")
         flag_add=False
     else:
         in_car=CarItem.objects.filter(user=user,course=course).exists()
